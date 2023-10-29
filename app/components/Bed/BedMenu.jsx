@@ -14,7 +14,7 @@ import {
   DialogTrigger,
   DialogDescription,
   DialogFooter,
-} from "@UI/Dialog";
+} from "@UI/dialog";
 import { BiBed } from "react-icons/bi";
 import AssignTenant from "../User/AssignTenant";
 import { useState } from "react";
