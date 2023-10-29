@@ -1,20 +1,25 @@
-import * as z from "zod"
-import { Room_Type } from "@prisma/client"
-import { CompleteHostel, relatedHostelModel, CompleteBed, relatedBedModel } from "./index"
+import * as z from "zod";
+import { Room_Type } from "@prisma/client";
+import {
+  CompleteHostel,
+  relatedHostelModel,
+  CompleteBed,
+  relatedBedModel,
+} from "./index";
 
 export const roomModel = z.object({
   id: z.string(),
   title: z.string(),
-  capacity: z.number().int(),
+  capacity: z.coerce.number().int(),
   isActive: z.boolean(),
   roomType: z.nativeEnum(Room_Type),
   hostelId: z.string(),
   floorId: z.string(),
-})
+});
 
 export interface CompleteRoom extends z.infer<typeof roomModel> {
-  hostel: CompleteHostel
-  Beds: CompleteBed[]
+  hostel: CompleteHostel;
+  Beds: CompleteBed[];
 }
 
 /**
@@ -22,7 +27,9 @@ export interface CompleteRoom extends z.infer<typeof roomModel> {
  *
  * NOTE: Lazy required in case of potential circular dependencies within schema
  */
-export const relatedRoomModel: z.ZodSchema<CompleteRoom> = z.lazy(() => roomModel.extend({
-  hostel: relatedHostelModel,
-  Beds: relatedBedModel.array(),
-}))
+export const relatedRoomModel: z.ZodSchema<CompleteRoom> = z.lazy(() =>
+  roomModel.extend({
+    hostel: relatedHostelModel,
+    Beds: relatedBedModel.array(),
+  })
+);
