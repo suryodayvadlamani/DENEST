@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 const allowedOrigins =
-  process.env.NODE_ENV === "production"
+  true || process.env.NODE_ENV === "production"
     ? ["https://denest-5u6o6hz2k-suryas-projects-5afd552f.vercel.app"]
     : ["http://localhost:3000"];
 
