@@ -23,28 +23,28 @@ export async function middleware(req: NextRequest) {
   }
 
   const token = await getToken({ req: req });
+  console.log(token, "To understand what happeing");
+  // if (!token) {
+  //   const url = new URL(`/auth/login`, req.url);
 
-  if (!token) {
-    const url = new URL(`/auth/login`, req.url);
-
-    url.searchParams.set("callbackUrl", encodeURI(req.url));
-    return NextResponse.redirect(url);
-  }
-  if (
-    token.role !== "ADMIN" &&
-    token.role !== "OWNER" &&
-    token.role !== "MANAGER"
-  ) {
-    const url = new URL(`/403`, req.url);
-    return NextResponse.rewrite(url);
-  }
-  if (
-    req.url.includes(`${allowedOrigins}/vendorManagment`) &&
-    token.role !== "ADMIN"
-  ) {
-    const url = new URL(`/403`, req.url);
-    return NextResponse.rewrite(url);
-  }
+  //   url.searchParams.set("callbackUrl", encodeURI(req.url));
+  //   return NextResponse.redirect(url);
+  // }
+  // if (
+  //   token.role !== "ADMIN" &&
+  //   token.role !== "OWNER" &&
+  //   token.role !== "MANAGER"
+  // ) {
+  //   const url = new URL(`/403`, req.url);
+  //   return NextResponse.rewrite(url);
+  // }
+  // if (
+  //   req.url.includes(`${allowedOrigins}/vendorManagment`) &&
+  //   token.role !== "ADMIN"
+  // ) {
+  //   const url = new URL(`/403`, req.url);
+  //   return NextResponse.rewrite(url);
+  // }
   return NextResponse.next();
 }
 export const config = {
