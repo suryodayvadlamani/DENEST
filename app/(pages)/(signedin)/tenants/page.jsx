@@ -1,8 +1,7 @@
 import { Input } from "@UI/input";
 import { Button } from "@UI/button";
 import { BsSearch } from "react-icons/bs";
-import AddManager from "@components/AddManager";
-import AddTenant from "../../../components/AddTenant";
+import AddTenant from "@components/AddTenant";
 export default function Hostels() {
   return (
     <section className="bg-black flex-grow">
