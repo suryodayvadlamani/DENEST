@@ -1,7 +1,7 @@
 import { request } from "@lib/axios_util";
 import { useToast } from "@UI/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Tenant_Pay } from "@lib/Query_Keys";
+import { TENANT_PAY } from "@lib/Query_Keys";
 
 export const createTenantPay = (data) => {
   return request({
@@ -18,7 +18,7 @@ export const getTenantPay = () => {
 };
 export function getTenantPayFn() {
   return useQuery({
-    queryKey: [Tenant_Pay],
+    queryKey: [TENANT_PAY],
     queryFn: () => getTenantPay(),
   });
 }
@@ -30,7 +30,7 @@ export function createTenantPayFn(cancelRef) {
       toast({
         title: "TenantPayment Added Successfully",
       });
-      queryClient.invalidateQueries([Tenant_Pay]);
+      queryClient.invalidateQueries([TENANT_PAY]);
       cancelRef.current.click();
     },
     onError: () => {

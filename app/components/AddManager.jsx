@@ -1,26 +1,18 @@
 "use client";
 import React from "react";
-import { Input } from "@UI/input";
 import { Button } from "@UI/button";
 import FormInput from "@components/Form/FormInput";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { userModel } from "../../prisma/zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { DialogClose } from "@radix-ui/react-dialog";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormControl,
-} from "@UI/form";
+import { Form } from "@UI/form";
 import { useToast } from "@UI/use-toast";
 import UserForm from "@components/UserForm";
 import AddressForm from "@components/AddressForm";
 import { useRef } from "react";
-import { createManagerFn } from "@/app/helpers/tenantRoom";
+import { createManagerFn } from "@/app/helpers/manager";
 
 const AddManager = () => {
   const userSchema = userModel.omit({ id: true });
