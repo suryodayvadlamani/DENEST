@@ -1,24 +1,19 @@
-import * as z from "zod";
-import { CompleteUser, relatedUserModel } from "./index";
-
-enum TenantPay_Type {
-  CASH = "CASH",
-  UPI = "UPI",
-  CARD = "CARD",
-}
+import * as z from "zod"
+import { TenantPay_Type } from "@prisma/client"
+import { CompleteUser, relatedUserModel } from "./index"
 
 export const tenantPayModel = z.object({
   id: z.string(),
   userId: z.string(),
-  amount: z.coerce.number().int().nullish(),
+  amount: z.number().int().nullish(),
   paidDate: z.date(),
   startDate: z.date(),
   endDate: z.date(),
   paymentType: z.nativeEnum(TenantPay_Type),
-});
+})
 
 export interface CompleteTenantPay extends z.infer<typeof tenantPayModel> {
-  user: CompleteUser;
+  user: CompleteUser
 }
 
 /**
@@ -26,9 +21,6 @@ export interface CompleteTenantPay extends z.infer<typeof tenantPayModel> {
  *
  * NOTE: Lazy required in case of potential circular dependencies within schema
  */
-export const relatedTenantPayModel: z.ZodSchema<CompleteTenantPay> = z.lazy(
-  () =>
-    tenantPayModel.extend({
-      user: relatedUserModel,
-    })
-);
+export const relatedTenantPayModel: z.ZodSchema<CompleteTenantPay> = z.lazy(() => tenantPayModel.extend({
+  user: relatedUserModel,
+}))

@@ -1,23 +1,18 @@
-import * as z from "zod";
-import { CompleteHostel, relatedHostelModel } from "./index";
+import * as z from "zod"
+import { Expense_Type } from "@prisma/client"
+import { CompleteHostel, relatedHostelModel } from "./index"
 
-enum Expense_Type {
-  UTILITY = "UTILITY",
-  GROCERY = "GROCERY",
-  VEGETABLES = "VEGETABLES",
-  OTHERS = "OTHERS",
-}
 export const expenseModel = z.object({
   id: z.string(),
   expenseType: z.nativeEnum(Expense_Type),
-  amount: z.coerce.number().int().nullish(),
+  amount: z.number().int().nullish(),
   description: z.string().nullish(),
   expenseDate: z.date(),
   hostelId: z.string(),
-});
+})
 
 export interface CompleteExpense extends z.infer<typeof expenseModel> {
-  hostel: CompleteHostel;
+  hostel: CompleteHostel
 }
 
 /**
@@ -25,8 +20,6 @@ export interface CompleteExpense extends z.infer<typeof expenseModel> {
  *
  * NOTE: Lazy required in case of potential circular dependencies within schema
  */
-export const relatedExpenseModel: z.ZodSchema<CompleteExpense> = z.lazy(() =>
-  expenseModel.extend({
-    hostel: relatedHostelModel,
-  })
-);
+export const relatedExpenseModel: z.ZodSchema<CompleteExpense> = z.lazy(() => expenseModel.extend({
+  hostel: relatedHostelModel,
+}))
