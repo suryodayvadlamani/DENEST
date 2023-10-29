@@ -1,6 +1,11 @@
 import * as z from "zod";
-import { TenantPay_Type } from "@prisma/client";
 import { CompleteUser, relatedUserModel } from "./index";
+
+enum TenantPay_Type {
+  CASH = "CASH",
+  UPI = "UPI",
+  CARD = "CARD",
+}
 
 export const tenantPayModel = z.object({
   id: z.string(),

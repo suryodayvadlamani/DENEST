@@ -1,11 +1,15 @@
 import * as z from "zod";
-import { Room_Type } from "@prisma/client";
 import {
   CompleteHostel,
   relatedHostelModel,
   CompleteBed,
   relatedBedModel,
 } from "./index";
+
+enum Room_Type {
+  AC = "AC",
+  NON_AC = "NON_AC",
+}
 
 export const roomModel = z.object({
   id: z.string(),
