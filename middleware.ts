@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 const allowedOrigins =
-  true || process.env.NODE_ENV === "production"
-    ? ["https://denest-5u6o6hz2k-suryas-projects-5afd552f.vercel.app"]
+  process.env.NODE_ENV === "production"
+    ? ["https://www.denest.in"]
     : ["http://localhost:3000"];
 
 export async function middleware(req: NextRequest) {
@@ -21,6 +21,7 @@ export async function middleware(req: NextRequest) {
   if (req.url.includes(`${allowedOrigins}/auth`)) {
     return NextResponse.next();
   }
+
   const token = await getToken({ req: req });
 
   if (!token) {
