@@ -1,0 +1,241 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGODB_URI")
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  name           String?
+  password       String?
+  /// @zod.min(1, { message: "Email is must." }).email("This is not a valid email.")
+  email          String?          @unique
+  emailVerified  DateTime?
+  image          String?
+  aadhar         String?
+  profession     String?
+  addressLine1   String?
+  addressLine2   String?
+  pinCode        String?
+  district       String?
+  state          String?
+  country        String?
+  contact        String?
+  createdDate    DateTime         @default(now())
+  isActive       Boolean          @default(true)
+  accounts       Account[]
+  sessions       Session[]
+  UserRoles      UserRoles[]
+  UserRoom       TenantRoom[]
+  RentCollection RentCollection[]
+  dues           Dues[]
+  TenantPay      TenantPay[]
+}
+
+model TenantRoom {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  rent      Int
+  advance   Int
+  isActive  Boolean  @default(true)
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bedId     String   @db.ObjectId
+  bed       Bed      @relation(fields: [bedId], references: [id], onDelete: Cascade)
+  startDate DateTime @default(now())
+  endDate   DateTime
+}
+
+model Dues {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String @unique @db.ObjectId
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Int
+  createdBy String
+}
+
+model RentCollection {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String   @db.ObjectId
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  collectedDate DateTime @default(now())
+}
+
+enum Room_Type {
+  AC
+  NON_AC
+}
+
+model Room {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  title    String
+  capacity Int
+  isActive Boolean   @default(true)
+  roomType Room_Type @default(NON_AC)
+  hostelId String    @db.ObjectId
+  floorId  String
+  hostel   Hostel    @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  Beds     Bed[]
+}
+
+model Bed {
+  id       String       @id @default(auto()) @map("_id") @db.ObjectId
+  title    String
+  isActive Boolean      @default(true)
+  occupied Boolean      @default(false)
+  roomId   String       @db.ObjectId
+  room     Room         @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  UserRoom TenantRoom[]
+}
+
+enum Expense_Type {
+  UTILITY
+  GROCERY
+  VEGETABLES
+  OTHERS
+}
+
+model Expense {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  expenseType Expense_Type
+  amount      Int?
+  description String?
+  expenseDate DateTime
+  hostelId    String       @db.ObjectId
+  hostel      Hostel       @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+}
+
+model TenantPay {
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String         @db.ObjectId
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount      Int?
+  paidDate    DateTime       @default(now())
+  startDate   DateTime
+  endDate     DateTime
+  paymentType TenantPay_Type
+}
+
+enum TenantPay_Type {
+  CASH
+  UPI
+  CARD
+}
+
+model VerificationToken {
+  identifier String   @id @default(auto()) @map("_id") @db.ObjectId
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Hostel {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  floors       String
+  addressLine1 String
+  addressLine2 String
+  pincode      String
+  district     String
+  state        String
+  country      String
+  contact      String
+  vendorId     String?     @db.ObjectId
+  vendor       Vendor?     @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  isActive     Boolean     @default(true)
+  UserRoles    UserRoles[]
+  Expense      Expense[]
+  Rooms        Room[]
+}
+
+model Vendor {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String
+  GSTIN        String
+  addressLine1 String
+  addressLine2 String
+  pincode      String
+  district     String
+  state        String
+  country      String
+  contact      String
+  isActive     Boolean     @default(true)
+  UserRoles    UserRoles[]
+  Hostel       Hostel[]
+}
+
+model Roles {
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  isActive  Boolean     @default(true)
+  userRoles UserRoles[]
+}
+
+model UserRoles {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  roleId   String    @db.ObjectId
+  userId   String    @db.ObjectId
+  vendorId String?   @db.ObjectId
+  hostelId String?   @db.ObjectId
+  isActive Boolean?  @default(true)
+  created  DateTime  @default(now())
+  expired  DateTime?
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vendor   Vendor?   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  hostel   Hostel?   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  role     Roles     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+}
+
+generator zod {
+  provider = "zod-prisma"
+  output   = "./zod" // (default) the directory where generated zod schemas will be saved
+
+  relationModel = true // (default) Create and export both plain and related models.
+  // relationModel         = "default" // Do not export model without relations.
+  // relationModel         = false // Do not generate related model
+
+  modelCase = "camelCase" // (default) Output models using pascal case (ex. UserModel, PostModel)
+  // modelCase             = "camelCase" // Output models using camel case (ex. userModel, postModel)
+
+  modelSuffix = "Model" // (default) Suffix to apply to your prisma models when naming Zod schemas
+
+  // useDecimalJs          = false // (default) represent the prisma Decimal type using as a JS number
+  useDecimalJs = true // represent the prisma Decimal type using Decimal.js (as Prisma does)
+
+  // https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-by-null-values
+  prismaJsonNullability = true // (default) uses prisma's scheme for JSON field nullability
+  // prismaJsonNullability = false // allows null assignment to optional JSON fields
+}
