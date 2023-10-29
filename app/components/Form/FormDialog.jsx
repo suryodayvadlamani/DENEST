@@ -4,7 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@UI/Dialog";
+} from "@UI/dialog";
 import { Button } from "@UI/button";
 import { cn } from "@lib/utils";
 import React from "react";
