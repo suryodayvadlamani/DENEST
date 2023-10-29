@@ -1,5 +1,5 @@
 import Tenantpay from "@components/TenantPay/TenantPay";
-import { getTenantPay } from "@/app/server_functions/TenantPay";
+import { getTenantPay } from "@/app/server_functions/Tenantpay";
 
 const page = async () => {
   const { isError, data } = await getTenantPay();
