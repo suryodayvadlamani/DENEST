@@ -8,7 +8,7 @@ const allowedOrigins =
 
 export async function middleware(req: NextRequest) {
   const origin = req.headers.get("origin");
-
+  console.log(req.url, allowedOrigins);
   if (!origin && !!allowedOrigins.includes(origin || "")) {
     const response = NextResponse.json(
       { message: "Bad Request" },
