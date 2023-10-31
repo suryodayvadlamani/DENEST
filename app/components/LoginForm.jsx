@@ -83,11 +83,10 @@ const LoginForm = () => {
             >
               Login
             </Button>
-
-            <Link className="text-sm mt-3 text-right" href={"/auth/register"}>
-              Don't have an account? <span className="underline">Register</span>
-            </Link>
           </form>
+          <Link className="text-sm mt-3 text-right" href={"/auth/register"}>
+            Don't have an account? <span className="underline">Register</span>
+          </Link>
         </Form>
         <div className="flex flex-row gap-4 mt-5 justify-around">
           {providers.map(({ name, Icon }) => (
