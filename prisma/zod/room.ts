@@ -9,7 +9,7 @@ export const roomModel = z.object({
   isActive: z.boolean(),
   roomType: z.nativeEnum(Room_Type),
   hostelId: z.string(),
-  floorId: z.string(),
+  floorId: z.number().int(),
 })
 
 export interface CompleteRoom extends z.infer<typeof roomModel> {

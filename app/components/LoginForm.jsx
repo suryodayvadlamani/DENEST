@@ -30,7 +30,8 @@ const LoginForm = () => {
       password: "",
     },
   });
-
+  const { formState } = form;
+  const { isSubmitting } = formState;
   const onSubmit = async (formData) => {
     const { email, password } = formData;
     setError("");
@@ -89,6 +90,8 @@ const LoginForm = () => {
               className="font-bold cursor-pointer px-6 py-2"
               variant="secondary"
               type="submit"
+              isLoading={isSubmitting}
+              disabled={isSubmitting}
             >
               Login
             </Button>

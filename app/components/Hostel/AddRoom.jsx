@@ -83,6 +83,7 @@ const AddRoom = () => {
             name="floorId"
             form={form}
             id="roomFloorId"
+            type="number"
             label="Floor Number"
           />
           <FormField
