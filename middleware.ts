@@ -18,16 +18,21 @@ export async function middleware(req: NextRequest) {
     return response;
   }
 
-  if (req.url.includes(`${allowedOrigins}/auth`)) {
+  if (req.url.includes(`${allowedOrigins[0]}/auth`)) {
     return NextResponse.next();
   }
 
   const token = await getToken({ req: req });
-  console.log(token, "To understand what happeing");
+
   if (!token) {
     const url = new URL(`/auth/login`, req.url);
 
-    url.searchParams.set("callbackUrl", encodeURI(req.url));
+    url.searchParams.set(
+      "callbackUrl",
+      encodeURI(
+        req.url == `${allowedOrigins[0]}/` ? `${req.url}dashboard` : req.url
+      )
+    );
     return NextResponse.redirect(url);
   }
   if (
