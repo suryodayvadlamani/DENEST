@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { BsGoogle, BsFacebook } from "react-icons/bs";
@@ -10,7 +10,14 @@ import { Button } from "@UI/button";
 import { useForm } from "react-hook-form";
 import { Form } from "@UI/form";
 import FormInput from "@components/Form/FormInput";
+import { useSearchParams, useRouter } from "next/navigation";
+
 const LoginForm = () => {
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const callbackUrl = searchParams.get("callbackUrl");
   const form = useForm({
     resolver: zodResolver(
       z.object({
@@ -23,20 +30,22 @@ const LoginForm = () => {
       password: "",
     },
   });
+
   const onSubmit = async (formData) => {
     const { email, password } = formData;
-
+    setError("");
     try {
       const res = await signIn("credentials", {
         email,
         password,
-        callbackUrl: "/dashboard",
+        redirect: false,
       });
 
-      if (res.error) {
+      if (res?.error) {
         setError("Invalid Credentials");
         return;
       }
+      router.replace(callbackUrl || "/dashboard");
     } catch (error) {
       console.log("Login Form error", error);
     }
@@ -84,10 +93,18 @@ const LoginForm = () => {
               Login
             </Button>
           </form>
-          <Link className="text-sm mt-3 text-right" href={"/auth/register"}>
-            Don't have an account? <span className="underline">Register</span>
-          </Link>
+          {error && (
+            <div className="w-fit text-sm py-1 px-3 rounded-md mt-3 mb-1">
+              {error}
+            </div>
+          )}
+          <div className="mt-4 ">
+            <Link className="text-sm mt-2 text-right" href={"/auth/register"}>
+              Don't have an account? <span className="underline">Register</span>
+            </Link>
+          </div>
         </Form>
+
         <div className="flex flex-row gap-4 mt-5 justify-around">
           {providers.map(({ name, Icon }) => (
             <Button
