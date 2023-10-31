@@ -19,6 +19,13 @@ function FormInput({ name, form, id, type = "text", label, ...props }) {
           <FormControl>
             <Input
               {...field}
+              onChange={(e) => {
+                field.onChange(
+                  type == "number" && e.target.value
+                    ? e.target.valueAsNumber
+                    : e.target.value
+                );
+              }}
               id={id}
               type={type}
               placeholder=" "

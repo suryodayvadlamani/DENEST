@@ -4,7 +4,7 @@ import { CompleteVendor, relatedVendorModel, CompleteUserRoles, relatedUserRoles
 export const hostelModel = z.object({
   id: z.string(),
   name: z.string(),
-  floors: z.string(),
+  floors: z.number().int().min(1, { message: "Floors is must." }),
   addressLine1: z.string(),
   addressLine2: z.string(),
   pincode: z.string(),

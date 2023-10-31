@@ -164,7 +164,8 @@ model VerificationToken {
 model Hostel {
   id           String      @id @default(auto()) @map("_id") @db.ObjectId
   name         String
-  floors       String
+  /// @zod.min(1, { message: "Floors is must." })
+  floors       Int
   addressLine1 String
   addressLine2 String
   pincode      String

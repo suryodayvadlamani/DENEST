@@ -59,7 +59,7 @@ const AddHostel = () => {
             name="floors"
             form={form}
             id="floors"
-            type="tel"
+            type="number"
             maxLength="12"
             label="Number of Floors"
           />

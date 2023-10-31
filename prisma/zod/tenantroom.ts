@@ -1,25 +1,20 @@
-import * as z from "zod";
-import {
-  CompleteUser,
-  relatedUserModel,
-  CompleteBed,
-  relatedBedModel,
-} from "./index";
+import * as z from "zod"
+import { CompleteUser, relatedUserModel, CompleteBed, relatedBedModel } from "./index"
 
 export const tenantRoomModel = z.object({
   id: z.string(),
-  rent: z.coerce.number().int(),
-  advance: z.coerce.number().int(),
+  rent: z.number().int(),
+  advance: z.number().int(),
   isActive: z.boolean(),
   userId: z.string(),
   bedId: z.string(),
   startDate: z.date(),
   endDate: z.date(),
-});
+})
 
 export interface CompleteTenantRoom extends z.infer<typeof tenantRoomModel> {
-  user: CompleteUser;
-  bed: CompleteBed;
+  user: CompleteUser
+  bed: CompleteBed
 }
 
 /**
@@ -27,10 +22,7 @@ export interface CompleteTenantRoom extends z.infer<typeof tenantRoomModel> {
  *
  * NOTE: Lazy required in case of potential circular dependencies within schema
  */
-export const relatedTenantRoomModel: z.ZodSchema<CompleteTenantRoom> = z.lazy(
-  () =>
-    tenantRoomModel.extend({
-      user: relatedUserModel,
-      bed: relatedBedModel,
-    })
-);
+export const relatedTenantRoomModel: z.ZodSchema<CompleteTenantRoom> = z.lazy(() => tenantRoomModel.extend({
+  user: relatedUserModel,
+  bed: relatedBedModel,
+}))
