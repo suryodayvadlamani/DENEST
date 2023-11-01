@@ -3,7 +3,7 @@
 import React from "react";
 import AddExpense from "@components/Expense/AddExpense";
 import { DataTable } from "@components/DataTable/DataTable";
-import { large_columns } from "@components/Expense/columns";
+import { large_columns } from "./Columns";
 import FormDialog from "@components/Form/FormDialog";
 import { BsSearch } from "react-icons/bs";
 import { Input } from "@UI/input";
