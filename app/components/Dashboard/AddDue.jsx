@@ -2,25 +2,18 @@ import React from "react";
 
 import { getDuesFn } from "@/app/helpers/dues";
 import { columns2 } from "./Columns2";
-import { DataTable } from "./DataTable";
-import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { DataTable } from "@components/DataTable/DataTable";
 const AddDue = () => {
   const { data: dueData } = getDuesFn();
-  const tableData = dueData?.data?.slice(0, 8);
-  const table = useReactTable({
-    data: tableData,
-    columns: columns2,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
+  console.log(dueData);
   return (
     <>
-      {tableData?.length > 0 && (
+      {dueData?.data?.length > 0 && (
         <DataTable
           columns={columns2}
-          table={table}
+          data={dueData?.data}
           title={"Defaulters"}
-          pagination={false}
+          pagination={true}
           className={"mt-4 flex-1"}
         />
       )}

@@ -5,23 +5,17 @@ import { BsGraphUpArrow } from "react-icons/bs";
 import { BsGraphDownArrow } from "react-icons/bs";
 import KPI from "./KPI";
 import { getDashboardsFn } from "@/app/helpers/dashboard";
-import { Card, CardContent, CardFooter, CardTitle } from "@UI/card";
+import { Card, CardContent, CardTitle } from "@UI/card";
 import dynamic from "next/dynamic";
 import GaugeChart from "@components/Charts/Guage";
 import { useMemo } from "react";
 import { useState } from "react";
 import { getExpensesFn } from "@/app/helpers/expense";
-import {
-  getCoreRowModel,
-  useReactTable,
-  getFilteredRowModel,
-} from "@tanstack/react-table";
 
 import { columns } from "@components/Dashboard/Columns";
-import { DataTable } from "@components/Dashboard/DataTable";
+import { DataTable } from "@components/DataTable/DataTable";
 import AddDue from "@components/Dashboard/AddDue";
 import { getHostelsFn } from "@/app/helpers/hostel";
-import { Button } from "../UI/button";
 
 const Barchart = dynamic(() => import("@components/Charts/Barchart"), {
   ssr: false,
@@ -139,12 +133,6 @@ const Dashboard = () => {
     setGuageData(data);
   }, [barData]);
 
-  const table = useReactTable({
-    data: allExpenseData?.data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
   return (
     <div className="container flex flex-col gap-3 h-full">
       <div className="flex flex-col md:flex-row gap-3 w-full md:h-2/3 ">
@@ -196,7 +184,13 @@ const Dashboard = () => {
           <CardTitle className="p-6">Expenses</CardTitle>
           <CardContent className="m-2">
             {allExpenseData?.data?.length > 0 && (
-              <DataTable className="mt-4" columns={columns} table={table} />
+              <DataTable
+                columns={columns}
+                data={allExpenseData?.data}
+                pagination={true}
+                sorting={true}
+                className={"mt-4 flex-1"}
+              />
             )}
           </CardContent>
         </Card>

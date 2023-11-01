@@ -1,32 +1,13 @@
 "use client";
 import AddTenantPay from "@components/TenantPay/AddTenantPay";
 import { columns } from "@components/TenantPay/Columns";
-import { DataTable } from "@components/TenantPay/DataTable";
+import { DataTable } from "@components/DataTable/DataTable";
 import FormDialog from "@components/Form/FormDialog";
 import { BsSearch } from "react-icons/bs";
 import { Input } from "@UI/input";
 import { Button } from "@UI/button";
-import {
-  getCoreRowModel,
-  useReactTable,
-  getFilteredRowModel,
-  getPaginationRowModel,
-} from "@tanstack/react-table";
-import { useState } from "react";
 
 function Tenantpay({ data }) {
-  const [columnFilters, setColumnFilters] = useState();
-  const table = useReactTable({
-    data: data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    state: {
-      columnFilters,
-    },
-  });
   return (
     <>
       <div
@@ -57,7 +38,13 @@ function Tenantpay({ data }) {
         </FormDialog>
       </div>
       {data?.length > 0 && (
-        <DataTable className="mt-4" columns={columns} table={table} />
+        <DataTable
+          columns={columns}
+          data={data}
+          pagination={true}
+          sorting={true}
+          className={"mt-4 flex-1"}
+        />
       )}
     </>
   );

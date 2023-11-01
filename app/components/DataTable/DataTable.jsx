@@ -1,6 +1,13 @@
 "use client";
 
-import { flexRender } from "@tanstack/react-table";
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  useReactTable,
+  getSortedRowModel,
+} from "@tanstack/react-table";
 
 import {
   Table,
@@ -10,12 +17,46 @@ import {
   TableHeader,
   TableRow,
 } from "@UI/table";
+import { Card, CardContent, CardFooter, CardTitle } from "@UI/card";
+import { DataTablePagination } from "./DataTablePagination";
 import { cn } from "@/app/lib/utils";
-import { Button } from "@UI/button";
-export function DataTable({ columns, className, table }) {
+import { useState } from "react";
+export function DataTable({
+  data,
+  columns,
+  className,
+  title,
+  pagination,
+  sorting,
+}) {
+  const [sortData, setSortData] = useState([]);
+  const [columnFilters, setColumnFilters] = useState();
+  let tableObj = {
+    data: data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      columnFilters,
+    },
+  };
+  if (sorting)
+    tableObj = {
+      ...tableObj,
+      onSortingChange: setSortData,
+      getSortedRowModel: getSortedRowModel(),
+      state: { ...tableObj.state, sorting: sortData },
+    };
+
+  if (pagination)
+    tableObj = { ...tableObj, getPaginationRowModel: getPaginationRowModel() };
+  const table = useReactTable(tableObj);
+
   return (
-    <>
-      <div className={cn("rounded-md border", className)}>
+    <Card className={cn(className)}>
+      {title && <CardTitle className="p-6">{title}</CardTitle>}
+      <CardContent className="pb-0">
         <Table className="relative">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -64,25 +105,12 @@ export function DataTable({ columns, className, table }) {
             )}
           </TableBody>
         </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
-      </div>
-    </>
+      </CardContent>
+      {pagination && (
+        <CardFooter className="flex items-center justify-end space-x-2 py-2">
+          <DataTablePagination table={table} />
+        </CardFooter>
+      )}
+    </Card>
   );
 }

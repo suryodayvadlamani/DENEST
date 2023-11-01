@@ -2,20 +2,11 @@
 
 import { Button } from "@UI/button";
 import { Input } from "@UI/input";
-import Link from "next/link";
 import { BsSearch } from "react-icons/bs";
-import { buttonVariants } from "@UI/button";
-import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { DataTable } from "@components/Vendor/DataTable";
+import { DataTable } from "@components/DataTable/DataTable";
 import { columns } from "@components/Vendor/Columns";
 import { getVendorsFn } from "@/app/helpers/vendor";
-import {
-  getCoreRowModel,
-  useReactTable,
-  getFilteredRowModel,
-} from "@tanstack/react-table";
-import { useQuery } from "@tanstack/react-query";
 import FormDialog from "@components/Form/FormDialog";
 import AddVendor from "@components/Vendor/AddVendor";
 
@@ -24,18 +15,6 @@ const Hostels = () => {
   const { isLoading, data, isError, error } = getVendorsFn(
     session?.role !== "ADMIN"
   );
-
-  const [columnFilters, setColumnFilters] = useState();
-  const table = useReactTable({
-    data: data?.data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      columnFilters,
-    },
-  });
 
   if (status == "loading") return "loading";
   return (
@@ -69,7 +48,13 @@ const Hostels = () => {
         )}
       </div>
       {data?.data?.length > 0 && (
-        <DataTable className="mt-4" columns={columns} table={table} />
+        <DataTable
+          columns={columns}
+          data={data?.data}
+          pagination={true}
+          sorting={true}
+          className={"mt-4 flex-1"}
+        />
       )}
     </>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { LuMoreHorizontal } from "react-icons/lu";
+import { LuMoreHorizontal, LuArrowDownUp } from "react-icons/lu";
 
 import { Button } from "@UI/button";
 import {
@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@UI/dropdown-menu";
+import { DataTableColumnHeader } from "@components/DataTable/DataTableColumnHeader";
 import { putCall } from "@/app/helpers/httpHelper";
 import { useRouter } from "next/navigation";
 
@@ -20,7 +21,9 @@ export const columns = [
   },
   {
     accessorKey: "hostel",
-    header: "Hostel",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Hostel" />
+    ),
   },
   {
     accessorKey: "role",
@@ -32,7 +35,9 @@ export const columns = [
   },
   {
     accessorKey: "email",
-    header: "Email",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Email" />
+    ),
   },
   {
     accessorKey: "contact",

@@ -1,35 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import AddExpense from "@components/Expense/AddExpense";
-import { mobile_columns, large_columns } from "@components/Expense/Columns";
-import { DataTable } from "@components/Expense/DataTable";
+import { DataTable } from "@components/DataTable/DataTable";
+import { large_columns } from "@components/Expense/columns";
 import FormDialog from "@components/Form/FormDialog";
 import { BsSearch } from "react-icons/bs";
 import { Input } from "@UI/input";
 import { Button } from "@UI/button";
-import {
-  getCoreRowModel,
-  useReactTable,
-  getFilteredRowModel,
-} from "@tanstack/react-table";
-import useWindowDimensions from "@/app/hooks/useWindowDimension";
 
 function Expense({ data }) {
-  const { width, height } = useWindowDimensions();
-
-  const [columnFilters, setColumnFilters] = useState();
-  const table = useReactTable({
-    data: data,
-    columns: width >= "900" ? large_columns : mobile_columns,
-    getCoreRowModel: getCoreRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      columnFilters,
-    },
-  });
-
   return (
     <>
       <div
@@ -61,9 +41,11 @@ function Expense({ data }) {
       </div>
       {data.length > 0 && (
         <DataTable
-          className="mt-4"
-          columns={width >= "900" ? large_columns : mobile_columns}
-          table={table}
+          columns={large_columns}
+          data={data}
+          pagination={true}
+          sorting={true}
+          className={"mt-4 flex-1"}
         />
       )}
     </>
