@@ -1,6 +1,7 @@
 // import { MainNavItem, SidebarNavItem } from "types/nav"
 
-import { LuBuilding2, LuBedDouble, LuIndianRupee } from "react-icons/lu";
+import { LuBuilding2, LuIndianRupee } from "react-icons/lu";
+import { AiOutlineUsergroupDelete } from "react-icons/ai";
 import { FaUserLock, FaUserPlus, FaUser } from "react-icons/fa";
 import AddTenant from "@components/User/AddTenant";
 import AddVendor from "@components/Vendor/AddVendor";
@@ -13,10 +14,10 @@ import AssignRole from "@components/User/AssignRole";
 // export const docsConfig: DocsConfig = {
 export const docsConfig = {
   mainNav: [
-    {
-      href: "/dashboard",
-      title: "Dashboard",
-    },
+    // {
+    //   href: "/dashboard",
+    //   title: "Dashboard",
+    // },
     {
       href: "/hostels",
       title: "Hostel Managment",
@@ -36,6 +37,11 @@ export const docsConfig = {
         href: "/hostels/expenses",
         title: "Expenses",
         icon: LuIndianRupee,
+      },
+      {
+        href: "/hostels/defaulters",
+        title: "Rent Unpaid",
+        icon: AiOutlineUsergroupDelete,
       },
       {
         href: "/hostels/tenantpay",

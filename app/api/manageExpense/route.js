@@ -99,7 +99,12 @@ export async function GET(request) {
         hostel: true,
       },
     });
-
+    resp = resp.map((x) => {
+      return {
+        ...x,
+        expenseDate: x.expenseDate.toLocaleDateString(),
+      };
+    });
     return NextResponse.json(resp, { status: 200 });
   } catch (err) {
     console.log(err);

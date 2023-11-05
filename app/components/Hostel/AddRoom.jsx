@@ -25,7 +25,7 @@ import {
 import { DialogClose } from "@radix-ui/react-dialog";
 import { getHostels } from "@/app/server_functions/Hostels";
 import { createRoom } from "@/app/server_functions/Rooms";
-const AddRoom = () => {
+const AddRoom = ({ selectedHostel, selectedFloor }) => {
   const roomSchema = roomModel.omit({ id: true });
   const [hostelsData, setHostelsData] = useState([]);
   const cancelRef = useRef(null);
@@ -43,8 +43,8 @@ const AddRoom = () => {
       title: "",
       capacity: 1,
       roomType: "NON_AC",
-      floorId: "",
-      hostelId: "",
+      floorId: selectedFloor || "",
+      hostelId: selectedHostel || "",
       isActive: true,
     },
   });

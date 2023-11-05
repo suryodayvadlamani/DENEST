@@ -12,7 +12,7 @@ import { Form } from "@UI/form";
 import { createExpenseFn } from "@/app/helpers/expense";
 import { getHostelsFn } from "@/app/helpers/hostel";
 import { DialogClose } from "@radix-ui/react-dialog";
-function AddExpense() {
+function AddExpense({ hostelsData }) {
   const expenseSchema = expenseModel.omit({ id: true });
   const cancelRef = useRef(null);
   const form = useForm({
@@ -25,7 +25,6 @@ function AddExpense() {
       hostelId: "",
     },
   });
-  const { isLoading, data: hostelsData, isError, error } = getHostelsFn();
 
   const { mutate: postExpense, isLoading: mutationLoading } = createExpenseFn();
   const onSubmit = async (data) => {
@@ -63,7 +62,7 @@ function AddExpense() {
           form={form}
           id="hostelId"
           label="Hostel"
-          options={hostelsData?.data?.map((hostel) => {
+          options={hostelsData?.map((hostel) => {
             return { value: hostel.id, title: hostel.name };
           })}
         />

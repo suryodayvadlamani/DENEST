@@ -4,24 +4,21 @@ import { BsPeopleFill } from "react-icons/bs";
 import { BsGraphUpArrow } from "react-icons/bs";
 import { BsGraphDownArrow } from "react-icons/bs";
 import KPI from "./KPI";
-import { getDashboardsFn } from "@/app/helpers/dashboard";
 import { Card, CardContent, CardTitle } from "@UI/card";
 import dynamic from "next/dynamic";
 import GaugeChart from "@components/Charts/Guage";
 import { useMemo } from "react";
 import { useState } from "react";
-import { getExpensesFn } from "@/app/helpers/expense";
 
 import { columns } from "@components/Dashboard/Columns";
 import { DataTable } from "@components/DataTable/DataTable";
 import AddDue from "@components/Dashboard/AddDue";
-import { getHostelsFn } from "@/app/helpers/hostel";
 
 const Barchart = dynamic(() => import("@components/Charts/Barchart"), {
   ssr: false,
 });
 
-const Dashboard = () => {
+const Dashboard = ({ hostelsData, dashboardData, allExpenseData }) => {
   const [guageData, setGuageData] = useState({});
   const makeReducer = (acc, cur) => {
     const newQty = parseInt(acc[cur?.month] ?? 0) + parseInt(cur.amount);
@@ -32,17 +29,9 @@ const Dashboard = () => {
       ...a,
     };
   };
-  const {
-    data: dashboardData,
-    isError,
-    isFetched,
-    isLoading,
-    isLoadingError,
-  } = getDashboardsFn();
-  const { data: hostelsData } = getHostelsFn();
   const { occupied, totalBeds } = useMemo(() => {
     if (!hostelsData) return { occupied: 0, totalBeds: 0 };
-    return hostelsData?.data?.reduce(
+    return hostelsData.reduce(
       function (acc, hostel) {
         const oc = hostel?.Rooms.reduce(function (oacc, room) {
           return oacc + room.Beds.filter((bed) => bed.occupied).length;
@@ -61,7 +50,7 @@ const Dashboard = () => {
   }, [hostelsData]);
 
   const { totalRent, barData } = useMemo(() => {
-    let paidData = dashboardData?.data?.paidData
+    let paidData = dashboardData?.paidData
       .map((a) => {
         return {
           amount: a.amount,
@@ -71,7 +60,7 @@ const Dashboard = () => {
         };
       })
       .reduce(makeReducer, {});
-    let expenseData = dashboardData?.data?.expenseData
+    let expenseData = dashboardData?.expenseData
       .map((a) => {
         return {
           amount: a.amount,
@@ -97,7 +86,7 @@ const Dashboard = () => {
       "Nov",
       "Dec",
     ];
-    const totalRent = dashboardData?.data?.rentData.reduce((acc, cur) => {
+    const totalRent = dashboardData?.rentData.reduce((acc, cur) => {
       return acc + cur.rent;
     }, 0);
     const barData = months.map((x) => {
@@ -108,8 +97,7 @@ const Dashboard = () => {
       };
     });
     return { totalRent, barData };
-  }, [dashboardData?.data]);
-  const { data: allExpenseData } = getExpensesFn();
+  }, [dashboardData]);
 
   const gData = useMemo(() => {
     const totalExpense = barData.reduce((acc, cur) => {
@@ -183,10 +171,10 @@ const Dashboard = () => {
         <Card className="flex flex-col gap-3 md:w-2/3 w-full">
           <CardTitle className="p-6">Expenses</CardTitle>
           <CardContent className="m-2">
-            {allExpenseData?.data?.length > 0 && (
+            {allExpenseData?.length > 0 && (
               <DataTable
                 columns={columns}
-                data={allExpenseData?.data}
+                data={allExpenseData}
                 pagination={true}
                 sorting={true}
                 className={"mt-4 flex-1"}

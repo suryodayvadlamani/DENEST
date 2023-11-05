@@ -101,7 +101,13 @@ export async function GET(request) {
 
     return NextResponse.json(
       resp.map((x) => {
-        return { ...x, user: x.user.name, userId: x.user.id };
+        return {
+          ...x,
+          startDate: x.startDate.toLocaleDateString(),
+          endDate: x.endDate.toLocaleDateString(),
+          user: x.user.name,
+          userId: x.user.id,
+        };
       }),
       { status: 200 }
     );

@@ -7,8 +7,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@UI/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@UI/avatar";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@UI/avatar";
+import { FaUserTie } from "react-icons/fa";
 import { signOut, useSession } from "next-auth/react";
 
 const ProfileButton = () => {
@@ -21,7 +22,7 @@ const ProfileButton = () => {
         <Avatar className="w-9 h-9 ml-2 pr-0 cursor-pointer">
           <AvatarImage src={session?.user?.image} />
           <AvatarFallback className="dark:bg-primary bg-primary text-white">
-            CN
+            <FaUserTie className="text-xl" />
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>

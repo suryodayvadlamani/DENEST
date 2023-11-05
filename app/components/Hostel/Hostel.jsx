@@ -138,7 +138,10 @@ function Hostel({ hostelsData }) {
                   title="Add Room"
                   triggerTitle="+Add Room"
                 >
-                  <AddRoom />
+                  <AddRoom
+                    selectedHostel={selectedHostel}
+                    selectedFloor={selectedFloor}
+                  />
                 </FormDialog>
               </CardContent>
             </CardHeader>
