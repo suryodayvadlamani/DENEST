@@ -8,7 +8,8 @@ import {
   useReactTable,
   getSortedRowModel,
 } from "@tanstack/react-table";
-
+import { BsSearch } from "react-icons/bs";
+import { Input } from "@UI/input";
 import {
   Table,
   TableBody,
@@ -22,6 +23,8 @@ import { DataTablePagination } from "./DataTablePagination";
 import { cn } from "@/app/lib/utils";
 import { useState } from "react";
 export function DataTable({
+  searchPlaceholder,
+  filterColumn,
   data,
   columns,
   className,
@@ -55,7 +58,33 @@ export function DataTable({
 
   return (
     <Card className={cn(className)}>
-      {title && <CardTitle className="p-6">{title}</CardTitle>}
+      {title && (
+        <CardTitle className="pl-6 flex flex-row items-center justify-between">
+          {title}
+          <div
+            className="flex max-w-sm mx-10 my-5 items-center space-x-2 border-input border
+       rounded-md 
+       ring-offset-background
+       focus-within:outline-none
+        focus-within:ring-2 
+        focus-within:ring-ring 
+        focus-within:ring-offset-2"
+          >
+            <BsSearch className="mx-2" />
+
+            <Input
+              placeholder={searchPlaceholder}
+              value={table.getColumn(filterColumn)?.getFilterValue() ?? ""}
+              onChange={(event) =>
+                table
+                  .getColumn(filterColumn)
+                  ?.setFilterValue(event.target.value)
+              }
+              className=" border-0 hover:border-0 pl-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+          </div>
+        </CardTitle>
+      )}
       <CardContent className="pb-0">
         <Table className="relative">
           <TableHeader>

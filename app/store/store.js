@@ -1,6 +1,6 @@
-import { observable } from "@legendapp/state";
+import { create } from "zustand";
 
-export const state$ = observable({
-  vendor: [],
-  roles: [],
+export const useStore = create((set) => {
+  filter: {
+  }
 });

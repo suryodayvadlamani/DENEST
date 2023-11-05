@@ -20,8 +20,20 @@ export const columns = [
     header: "Tenant",
   },
   {
+    accessorKey: "roomName",
+    header: "Room Name",
+  },
+  {
+    accessorKey: "advance",
+    header: "Advance",
+  },
+  {
+    accessorKey: "contact",
+    header: "Contact",
+  },
+  {
     accessorKey: "amount",
-    header: "Amount",
+    header: "Paid",
   },
   {
     accessorKey: "paymentType",

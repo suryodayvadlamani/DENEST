@@ -86,16 +86,21 @@ export async function GET(request) {
       { status: 403 }
     );
   try {
-    const {
-      nextUrl: { search },
-    } = request;
-    const { isActive } = new URLSearchParams(search);
-
-    const whereClause = isActive ? { isActive: true } : {};
-
     const resp = await prisma.tenantPay.findMany({
       include: {
-        user: true,
+        user: {
+          include: {
+            UserRoom: {
+              include: {
+                bed: {
+                  include: {
+                    room: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 
@@ -103,9 +108,12 @@ export async function GET(request) {
       resp.map((x) => {
         return {
           ...x,
+          advance: x.user.UserRoom[0].advance,
+          roomName: x.user.UserRoom[0]?.bed.room.title,
           startDate: x.startDate.toLocaleDateString(),
           endDate: x.endDate.toLocaleDateString(),
           user: x.user.name,
+          contact: x.user.contact,
           userId: x.user.id,
         };
       }),
