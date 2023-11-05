@@ -34,7 +34,7 @@ function Hostel({ hostelsData }) {
   }, [hostelsData, selectedFloor, selectedHostel]);
   const form = useForm({
     defaultValues: {
-      floorId: 1,
+      floorId: "1",
       hostelId: hostelsData[0].id,
     },
   });
@@ -87,7 +87,7 @@ function Hostel({ hostelsData }) {
                   <FormLabel>Floor</FormLabel>
                   <Select
                     onValueChange={(e) => {
-                      setSelectedFloor(e);
+                      setSelectedFloor(parseInt(e));
                       field.onChange;
                     }}
                     defaultValue={field.value}
@@ -109,7 +109,7 @@ function Hostel({ hostelsData }) {
                         return (
                           <SelectItem
                             key={`Floor${index + 1}`}
-                            value={index + 1}
+                            value={`${index + 1}`}
                           >
                             {index + 1}
                           </SelectItem>
