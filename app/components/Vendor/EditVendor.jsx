@@ -121,8 +121,8 @@ const EditVendor = () => {
           <div className="flex gap-3 justify-around">
             <Button
               type="submit"
-              disabled={isSubmitting || isLoading}
-              isLoading={isSubmitting || isLoading}
+              disabled={isSubmitting}
+              isLoading={isSubmitting}
               className="flex  justify-center gap-2"
             >
               Submit

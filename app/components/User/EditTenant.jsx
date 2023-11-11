@@ -1,5 +1,5 @@
 "use client";
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { Button } from "@UI/button";
 import FormInput from "@components/Form/FormInput";
 import UserFormLoader from "@components/loaders/UserForm";
@@ -15,60 +15,78 @@ import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { updateUserByIdFn } from "@/app/helpers/user";
 import { useStore } from "@/app/store/store";
+import { getUserById, updateUser } from "@/app/server_functions/User";
 
 const EditTenant = () => {
   const userSchema = userModel.omit({ id: true });
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
   const usersData = useStore((state) => {
-    if (state.users.length) return state.users.filter((x) => x.id == userId)[0];
+    return state.users.filter((x) => x.id == userId)[0];
   });
+
+  const [data, setData] = useState(usersData);
   useEffect(() => {
     const getData = async () => {
-      const { data: userData } = await getUsers();
-      useStore.setState({
-        vendors: userData,
-      });
+      const { data: usersData } = await getUserById(userId);
+      setData(usersData);
     };
     if (!data) {
       getData();
     }
   }, []);
-  const { toast } = useToast();
+
   const form = useForm({
     resolver: zodResolver(userSchema),
     defaultValues: {
-      name: usersData.name,
-      email: usersData.email,
-      profession: usersData.profession,
-      aadhar: usersData.aadhar,
-      addressLine1: usersData.addressLine1,
-      addressLine2: usersData.addressLine2,
-      pincode: usersData.pincode,
-      district: usersData.district,
-      state: usersData.state,
-      country: usersData.country,
-      contact: usersData.contact,
-      isActive: usersData.isActive,
+      name: "",
+      email: "",
+      profession: "",
+      aadhar: "",
+      addressLine1: "",
+      addressLine2: "",
+      pincode: "",
+      district: "",
+      state: "",
+      country: "",
+      contact: "",
+      isActive: "",
       createdDate: new Date(),
     },
   });
-  const { reset } = form;
+  const { formState, reset } = form;
+  const { isSubmitting } = formState;
+
+  useEffect(() => {
+    if (data) {
+      reset({
+        name: usersData.name,
+        email: usersData.email,
+        profession: usersData.profession,
+        aadhar: usersData.aadhar,
+        addressLine1: usersData.addressLine1,
+        addressLine2: usersData.addressLine2,
+        pincode: usersData.pincode,
+        district: usersData.district,
+        state: usersData.state,
+        country: usersData.country,
+        contact: usersData.contact,
+        isActive: usersData.isActive,
+        createdDate: new Date(),
+      });
+    }
+  }, [data]);
 
   const route = useRouter();
   const goBack = (e) => {
     e.preventDefault();
-    route.replace("/userManagment");
+    route.replace("/userManagment", { scroll: false });
   };
 
-  const {
-    mutate: updateUser,
-    isLoading: mutationLoading,
-    isSuccess,
-  } = updateUserByIdFn();
-  if (isSuccess) route.replace("/userManagment");
-  const onSubmit = (data) => {
-    updateUser({ id: userId, data: data });
+  const onSubmit = async (formData) => {
+    const { isError } = await updateUser(userId, formData);
+
+    if (!isError) route.replace("/userManagment");
   };
 
   return (
@@ -115,13 +133,14 @@ const EditTenant = () => {
             />
             <div className="flex gap-3 justify-around">
               <Button
-                className="flex  justify-center gap-2"
-                disabled={mutationLoading}
                 type="submit"
-                isLoading={mutationLoading}
+                disabled={isSubmitting}
+                isLoading={isSubmitting}
+                className="flex  justify-center gap-2"
               >
-                Update
+                Submit
               </Button>
+
               <Button
                 className="flex w-20 justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6  "
                 onClick={(e) => goBack(e)}

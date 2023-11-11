@@ -150,12 +150,29 @@ export async function GET(request) {
       nextUrl: { search },
     } = request;
     const paramData = new URLSearchParams(search);
+
     const isTenant = paramData.get("isTenant");
-    let options = {};
+    const take = paramData.get("take");
+    const lastCursor = paramData.get("lastCursor");
+    let options = {
+      take: take ? parseInt(take) : 30,
+      ...(lastCursor && {
+        skip: 1,
+        cursor: {
+          id: lastCursor,
+        },
+      }),
+      orderBy: {
+        user: {
+          isActive: "asc",
+        },
+      },
+    };
 
     switch (session.role) {
       case "ADMIN":
         options = {
+          ...options,
           include: {
             user: true,
             hostel: true,
@@ -165,6 +182,7 @@ export async function GET(request) {
         break;
       case "OWNER":
         options = {
+          ...options,
           where: {
             AND: [
               { vendorId: session.user.vendorId },
@@ -182,6 +200,7 @@ export async function GET(request) {
         break;
       case "MANAGER":
         options = {
+          ...options,
           where: {
             AND: [{ hostelId: session.user.hostelId }, { roleId: TENANT }],
           },

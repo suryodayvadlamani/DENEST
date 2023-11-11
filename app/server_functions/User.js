@@ -21,3 +21,24 @@ export async function deleteUser(data) {
     return { isError: true, data: "Failed to read" };
   }
 }
+
+export async function getUserById(id) {
+  try {
+    const response = await nextFetch(`/api/manageTenant/${id}`, []);
+
+    return { isError: false, data: response };
+  } catch (e) {
+    return { isError: true, data: "Failed to read" };
+  }
+}
+
+export async function updateUser(id, data) {
+  try {
+    await nextFetch(`api/manageTenant/${id}`, [], "PUT", data);
+    revalidateTag(USERS);
+
+    return { isError: false, data: "success" };
+  } catch (e) {
+    return { isError: true, data: "Failed to create" };
+  }
+}
