@@ -9,13 +9,11 @@ import FormInput from "@components/Form/FormInput";
 import UserForm from "@components/UserForm";
 import AddressForm from "@components/AddressForm";
 import { Switch } from "@UI/switch";
-import { createVendorFn } from "@/app/helpers/vendor";
 import { DialogClose } from "@radix-ui/react-dialog";
-
+import { createVendor } from "@/app/server_functions/Vendor";
 const AddVendor = () => {
   const userSchema = vendorModel.omit({ id: true });
   const cancelRef = useRef(null);
-
   const form = useForm({
     resolver: zodResolver(userSchema),
     defaultValues: {
@@ -34,12 +32,15 @@ const AddVendor = () => {
     },
   });
 
-  const { mutate: postVendor, isLoading: mutationLoading } =
-    createVendorFn(cancelRef);
+  const { formState, reset } = form;
+  const { isSubmitting } = formState;
 
   const onSubmit = async (data) => {
     try {
-      postVendor(data);
+      const { isError } = await createVendor(data);
+      if (!isError) {
+        cancelRef.current.click();
+      }
     } catch (error) {
       console.log("Error during registration: ", error);
     }
@@ -81,8 +82,8 @@ const AddVendor = () => {
             <Button
               className="flex  justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6  "
               type="submit"
-              isLoading={mutationLoading}
-              disabled={mutationLoading}
+              isLoading={isSubmitting}
+              disabled={isSubmitting}
             >
               Submit
             </Button>

@@ -109,6 +109,7 @@ export function DataTable({
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
+                  className={row.original.isActive ? "" : "bg-primary"}
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >

@@ -13,6 +13,7 @@ import {
 import { DataTableColumnHeader } from "@components/DataTable/DataTableColumnHeader";
 import { putCall } from "@/app/helpers/httpHelper";
 import { useRouter } from "next/navigation";
+import { deleteUser } from "@/app/server_functions/User";
 
 export const columns = [
   {
@@ -74,23 +75,16 @@ export const columns = [
             <DropdownMenuItem
               onClick={async () => {
                 try {
-                  const res = await putCall(
-                    "api/manageTenant",
-                    {
-                      id: user.id,
-                      isActive: false,
-                    },
-                    {
-                      "Content-Type": "application/json",
-                      "Access-Control-Allow-Origin": "*",
-                    }
-                  );
+                  await deleteUser({
+                    id: user.id,
+                    isActive: !user.isActive,
+                  });
                 } catch (error) {
                   console.log("Error during registration: ", error);
                 }
               }}
             >
-              Delete
+              {user.isActive ? "Delete" : "Activate"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

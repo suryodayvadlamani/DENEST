@@ -13,58 +13,48 @@ import UserForm from "@components/UserForm";
 import AddressForm from "@components/AddressForm";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getUserByIdFn, updateUserByIdFn } from "@/app/helpers/user";
+import { updateUserByIdFn } from "@/app/helpers/user";
+import { useStore } from "@/app/store/store";
 
 const EditTenant = () => {
   const userSchema = userModel.omit({ id: true });
-  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
-  const { data } = getUserByIdFn();
+  const usersData = useStore((state) => {
+    if (state.users.length) return state.users.filter((x) => x.id == userId)[0];
+  });
+  useEffect(() => {
+    const getData = async () => {
+      const { data: userData } = await getUsers();
+      useStore.setState({
+        vendors: userData,
+      });
+    };
+    if (!data) {
+      getData();
+    }
+  }, []);
   const { toast } = useToast();
   const form = useForm({
     resolver: zodResolver(userSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      profession: "",
-      aadhar: "",
-      addressLine1: "",
-      addressLine2: "",
-      pinCode: "",
-      district: "",
-      state: "",
-      country: "",
-      contact: "",
-      isActive: false,
+      name: usersData.name,
+      email: usersData.email,
+      profession: usersData.profession,
+      aadhar: usersData.aadhar,
+      addressLine1: usersData.addressLine1,
+      addressLine2: usersData.addressLine2,
+      pincode: usersData.pincode,
+      district: usersData.district,
+      state: usersData.state,
+      country: usersData.country,
+      contact: usersData.contact,
+      isActive: usersData.isActive,
       createdDate: new Date(),
     },
   });
-  const {
-    reset,
-    formState: { errors },
-  } = form;
+  const { reset } = form;
 
-  useEffect(() => {
-    if (data) {
-      reset({
-        name: data?.data.name,
-        email: data?.data.email,
-        profession: data?.data.profession,
-        aadhar: data?.data.aadhar,
-        addressLine1: data?.data.addressLine1,
-        addressLine2: data?.data.addressLine2,
-        pincode: data?.data.pincode,
-        district: data?.data.district,
-        state: data?.data.state,
-        country: data?.data.country,
-        contact: data?.data.contact,
-        isActive: data?.data.isActive,
-        createdDate: new Date(),
-      });
-    }
-  }, [data]);
   const route = useRouter();
   const goBack = (e) => {
     e.preventDefault();

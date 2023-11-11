@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@UI/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -7,22 +7,33 @@ import { vendorModel } from "@/prisma/zod";
 import { useSearchParams } from "next/navigation";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@UI/form";
 import FormInput from "@components/Form/FormInput";
-import { useToast } from "@UI/use-toast";
 import UserForm from "@components/UserForm";
 import AddressForm from "@components/AddressForm";
-import { getVendorByIdFn, updateVendorByIdFn } from "@/app/helpers/vendor";
-import { useQueryClient } from "@tanstack/react-query";
+import { updateVendorByIdFn } from "@/app/helpers/vendor";
 import { useRouter } from "next/navigation";
 import { Switch } from "@UI/switch";
+import { useStore } from "@/app/store/store";
+import { getVendorById, updateVendor } from "@/app/server_functions/Vendor";
 
 const EditVendor = () => {
   const userSchema = vendorModel.omit({ id: true });
-  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const vendorId = searchParams.get("id");
-  const { data } = getVendorByIdFn(vendorId);
+  const vendorData = useStore((state) => {
+    return state.vendors.filter((x) => x.id == vendorId)[0];
+  });
+  const [data, setData] = useState(vendorData);
 
-  const { toast } = useToast();
+  useEffect(() => {
+    const getData = async () => {
+      const { data: vendorData } = await getVendorById(vendorId);
+
+      setData(vendorData);
+    };
+    if (!data) {
+      getData();
+    }
+  }, []);
   const router = useRouter();
 
   const form = useForm({
@@ -42,38 +53,38 @@ const EditVendor = () => {
       isActive: false,
     },
   });
-  const { reset } = form;
+
+  const { formState, reset } = form;
+  const { isSubmitting } = formState;
   useEffect(() => {
     if (data) {
       reset({
-        GSTIN: data?.data.GSTIN,
-        name: data?.data.name,
-        email: data?.data.email,
-        aadhar: data?.data.aadhar,
-        addressLine1: data?.data.addressLine1,
-        addressLine2: data?.data.addressLine2,
-        pincode: data?.data.pincode,
-        district: data?.data.district,
-        state: data?.data.state,
-        country: data?.data.country,
-        contact: data?.data.contact,
-        isActive: data?.data.isActive,
+        GSTIN: data.GSTIN,
+        name: data.name,
+        email: data.email,
+        aadhar: data.aadhar,
+        addressLine1: data.addressLine1,
+        addressLine2: data.addressLine2,
+        pincode: data.pincode,
+        district: data.district,
+        state: data.state,
+        country: data.country,
+        contact: data.contact,
+        isActive: data.isActive,
       });
     }
   }, [data]);
-  const route = useRouter();
-  const goBack = () => {
-    route.back();
+
+  const goBack = (e) => {
+    e.preventDefault();
+    router.replace("/vendorManagment", { scroll: false });
+    //router.back();
   };
-  const {
-    mutate: updateVendor,
-    isLoading: mutationLoading,
-    isSuccess,
-  } = updateVendorByIdFn();
-  if (isSuccess) router.replace("/vendorManagment");
-  const onSubmit = () => {
-    const data = form.getValues();
-    updateVendor({ id: vendorId, data });
+
+  const onSubmit = async (formData) => {
+    const { isError } = await updateVendor(vendorId, formData);
+
+    if (!isError) router.replace("/vendorManagment");
   };
 
   return (
@@ -109,9 +120,9 @@ const EditVendor = () => {
           />
           <div className="flex gap-3 justify-around">
             <Button
-              onClick={onSubmit}
-              disabled={mutationLoading}
-              isLoading={mutationLoading}
+              type="submit"
+              disabled={isSubmitting || isLoading}
+              isLoading={isSubmitting || isLoading}
               className="flex  justify-center gap-2"
             >
               Submit
@@ -119,7 +130,7 @@ const EditVendor = () => {
 
             <Button
               className="flex w-20 justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6  "
-              onClick={goBack}
+              onClick={(e) => goBack(e)}
             >
               Cancel
             </Button>

@@ -37,7 +37,7 @@ export default async function Hostels() {
       </div>
       <div className="flex flex-col gap-2">
         {hostelsData &&
-          hostelsData.map((hostel) => {
+          hostelsData?.map((hostel) => {
             return (
               <HostelCard key={`hostelCard${hostel.id}`} hostel={hostel} />
             );

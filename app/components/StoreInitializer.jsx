@@ -1,12 +1,16 @@
 "use client";
-import { useRef } from "react";
+
 import { useStore } from "@/app/store/store";
-function StoreInitializer({ filter }) {
-  const init = useRef(false);
-  if (!init.current) {
-    useStore.setState({ filter });
-    init.current = true;
-  }
+function StoreInitializer({ filter, users, vendors }) {
+  useStore.setState((prevState) => ({
+    filter: filter,
+    users: users || prevState,
+    vendors: vendors || prevState,
+  }));
+  // const init = useRef(false);
+  // if (!init.current) {
+  //   init.current = true;
+  // }
   return null;
 }
 

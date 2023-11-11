@@ -10,8 +10,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@UI/dropdown-menu";
-import { putCall } from "@/app/helpers/httpHelper";
 import { useRouter } from "next/navigation";
+import { deleteVendor } from "@/app/server_functions/Vendor";
 
 export const columns = [
   {
@@ -61,23 +61,16 @@ export const columns = [
             <DropdownMenuItem
               onClick={async () => {
                 try {
-                  const res = await putCall(
-                    "api/manageVendor",
-                    {
-                      id: vendor.id,
-                      isActive: false,
-                    },
-                    {
-                      "Content-Type": "application/json",
-                      "Access-Control-Allow-Origin": "*",
-                    }
-                  );
+                  await deleteVendor({
+                    id: vendor.id,
+                    isActive: !vendor.isActive,
+                  });
                 } catch (error) {
                   console.log("Error during registration: ", error);
                 }
               }}
             >
-              Delete
+              {vendor.isActive ? "Delete" : "Activate"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -5,6 +5,8 @@ import { authOptions } from "../auth/[...nextauth]/route";
 import { limiter } from "../config/limiter";
 import { createRole } from "@/app/api/manageUserRole/route";
 import { MANAGER, TENANT } from "@lib/roleId";
+import { validateRole } from "@/app/helpers/validateRole";
+
 export async function POST(request) {
   const origin = request.headers.get("origin");
   const remaining = await limiter.removeTokens(1);
@@ -123,7 +125,7 @@ export async function PUT(request) {
       data: { ...request_data },
     });
 
-    return NextResponse.json({ message: "Tenant Registered" }, { status: 201 });
+    return NextResponse.json({ message: "Tenant deleted" }, { status: 201 });
   } catch (err) {
     console.log(err);
     return NextResponse.json(
@@ -134,35 +136,15 @@ export async function PUT(request) {
 }
 
 export async function GET(request) {
-  const origin = request.headers.get("origin");
-  const remaining = await limiter.removeTokens(1);
-  if (remaining < 0) {
-    return NextResponse.json(
-      { message: "Too many requests" },
-      { status: 429 },
-      {
-        headers: {
-          "Access-Control-Allow-Origin": origin || "*",
-        },
-      }
-    );
-  }
   const session = await getServerSession(authOptions);
-  if (!session)
+
+  const res = await validateRole();
+  if (res?.error)
     return NextResponse.json(
-      { message: "You don't have permission!" },
-      { status: 401 }
+      { message: res.error },
+      { status: res.statusCode }
     );
 
-  if (
-    session.role !== "ADMIN" &&
-    session.role !== "OWNER" &&
-    session.role !== "MANAGER"
-  )
-    return NextResponse.json(
-      { message: "You are not authorized" },
-      { status: 403 }
-    );
   try {
     const {
       nextUrl: { search },
@@ -170,6 +152,7 @@ export async function GET(request) {
     const paramData = new URLSearchParams(search);
     const isTenant = paramData.get("isTenant");
     let options = {};
+
     switch (session.role) {
       case "ADMIN":
         options = {
@@ -239,7 +222,7 @@ export async function GET(request) {
         assigned: usersOccupied.map((x) => x.userId).includes(ur.user.id),
         rent: usersOccupied.filter((x) => x.userId == ur.user.id)[0]?.rent,
         role: ur.role.name,
-        hostel: ur.hostel.name,
+        hostel: ur.hostel?.name,
       })),
 
       { status: 200 }
