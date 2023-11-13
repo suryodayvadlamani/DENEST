@@ -1,4 +1,4 @@
-export const GET_HOSTELS = "Hostels";
+export const HOSTELS = "Hostels";
 export const EXPENSES = "Expenses";
 export const USERS = "Users";
 export const TENANT_PAY = "TenantPay";

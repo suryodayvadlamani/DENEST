@@ -65,6 +65,9 @@ dependencies:
   '@tanstack/react-query-devtools':
     specifier: ^4.35.3
     version: 4.36.1(@tanstack/react-query@4.36.1)(react-dom@18.3.0-canary-8039e6d0b-20231026)(react@18.3.0-canary-8039e6d0b-20231026)
+  '@tanstack/react-query-next-experimental':
+    specifier: ^5.8.2
+    version: 5.8.2(@tanstack/react-query@4.36.1)(next@14.0.1-canary.1)(react-dom@18.3.0-canary-8039e6d0b-20231026)(react@18.3.0-canary-8039e6d0b-20231026)
   '@tanstack/react-table':
     specifier: ^8.9.7
     version: 8.10.7(react-dom@18.3.0-canary-8039e6d0b-20231026)(react@18.3.0-canary-8039e6d0b-20231026)
@@ -1380,6 +1383,20 @@ packages:
       react-dom: 18.3.0-canary-8039e6d0b-20231026(react@18.3.0-canary-8039e6d0b-20231026)
       superjson: 1.13.3
       use-sync-external-store: 1.2.0(react@18.3.0-canary-8039e6d0b-20231026)
+    dev: false
+
+  /@tanstack/react-query-next-experimental@5.8.2(@tanstack/react-query@4.36.1)(next@14.0.1-canary.1)(react-dom@18.3.0-canary-8039e6d0b-20231026)(react@18.3.0-canary-8039e6d0b-20231026):
+    resolution: {integrity: sha512-PI1FK3zJaVe/yjsn0qNAh2vm13gFXPxVB2tlRAPHayEXtGiKX2e0OCx8W+4eABCY2Dy3uSvOVq2RPZkTK4sKuA==}
+    peerDependencies:
+      '@tanstack/react-query': ^5.8.2
+      next: ^13 || ^14
+      react: ^18.0.0
+      react-dom: ^18.0.0
+    dependencies:
+      '@tanstack/react-query': 4.36.1(react-dom@18.3.0-canary-8039e6d0b-20231026)(react@18.3.0-canary-8039e6d0b-20231026)
+      next: 14.0.1-canary.1(react-dom@18.3.0-canary-8039e6d0b-20231026)(react@18.3.0-canary-8039e6d0b-20231026)
+      react: 18.3.0-canary-8039e6d0b-20231026
+      react-dom: 18.3.0-canary-8039e6d0b-20231026(react@18.3.0-canary-8039e6d0b-20231026)
     dev: false
 
   /@tanstack/react-query@4.36.1(react-dom@18.3.0-canary-8039e6d0b-20231026)(react@18.3.0-canary-8039e6d0b-20231026):

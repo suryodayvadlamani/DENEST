@@ -1,13 +1,13 @@
 "use server";
 
-import { GET_HOSTELS } from "@/app/lib/Query_Keys";
+import { HOSTELS } from "@/app/lib/Query_Keys";
 import nextFetch from "@/app/lib/nextFetch";
 import { revalidateTag } from "next/cache";
 
 export async function createBed(formData) {
   try {
     await nextFetch("api/manageBed", "", "POST", formData);
-    revalidateTag(GET_HOSTELS);
+    revalidateTag(HOSTELS);
 
     return { isError: false, data: "success" };
   } catch (e) {
@@ -17,7 +17,7 @@ export async function createBed(formData) {
 export async function deleteBed(formData) {
   try {
     await nextFetch(`/api/manageBed/${formData.id}`, "", "DELETE", formData);
-    revalidateTag(GET_HOSTELS);
+    revalidateTag(HOSTELS);
 
     return { isError: false, data: "success" };
   } catch (e) {

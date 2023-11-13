@@ -136,6 +136,7 @@ export async function PUT(request) {
 }
 
 export async function GET(request) {
+  console.log("Please dont call me");
   const session = await getServerSession(authOptions);
 
   const res = await validateRole();

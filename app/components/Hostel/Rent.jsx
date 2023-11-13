@@ -1,18 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@UI/card";
 import Mypiechart from "@components/Charts/piechart";
 import KPI from "./KPI";
-import { getHostelById } from "@/app/server_functions/Hostels";
-async function Rent({ hostelId }) {
-  const { isError, data: rentData } = await getHostelById({ hostelId });
-  if (isError) return <p>Erorr</p>;
-
-  const expectedRent = rentData?.reduce(function (acc, user) {
-    return acc + user.rent;
-  }, 0);
-  const collectedRent = rentData?.reduce(function (acc, user) {
-    return acc + user.amount;
-  }, 0);
-
+function Rent({ expectedRent, collectedRent }) {
   const revenueData = [
     { name: "occupied", value: collectedRent, fill: "fill-primary" },
     {

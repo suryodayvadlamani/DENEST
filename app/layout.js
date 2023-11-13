@@ -5,7 +5,6 @@ import { ThemeProvider } from "@components/ThemeProvider";
 import { Toaster } from "@UI/toaster";
 import { siteConfig } from "@/config/site";
 import TanstackProvider from "@components/providers/TanstackProvider";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 const inter = Inter({ subsets: ["latin"] });
 export const metadata = {
   title: {
@@ -25,7 +24,6 @@ export default function RootLayout({ children }) {
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
             <TanstackProvider>
-              <ReactQueryDevtools initialIsOpen={false} />
               <main className="w-screen relative flex min-h-screen flex-col">
                 {children}
                 <Toaster />

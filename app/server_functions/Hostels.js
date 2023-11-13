@@ -1,16 +1,16 @@
 "use server";
 
-import { GET_HOSTELS, DUES } from "@/app/lib/Query_Keys";
+import { HOSTELS, DUES } from "@/app/lib/Query_Keys";
 import nextFetch from "@/app/lib/nextFetch";
 import { revalidateTag } from "next/cache";
 
-export async function getHostels() {
+export async function getHostels(filters) {
   try {
-    const response = await nextFetch("api/manageHostel", [GET_HOSTELS]);
+    const response = await nextFetch(`api/manageHostel?${filters}`, [HOSTELS]);
 
-    return { isError: false, data: response };
+    return { error: false, data: response };
   } catch (e) {
-    return { isError: true, data: "Failed to read" };
+    return { error: true, data: "Failed to read" };
   }
 }
 export async function getDefaulters() {
@@ -25,7 +25,7 @@ export async function getDefaulters() {
 export async function getHostelById({ hostelId }) {
   try {
     const response = await nextFetch(`api/manageHostel/rent/${hostelId}`, [
-      GET_HOSTELS,
+      HOSTELS,
       hostelId,
     ]);
 
@@ -37,7 +37,7 @@ export async function getHostelById({ hostelId }) {
 export async function createHostel(formData) {
   try {
     await nextFetch("api/manageHostel", "", "POST", formData);
-    revalidateTag(GET_HOSTELS);
+    revalidateTag(HOSTELS);
 
     return { isError: false, data: "success" };
   } catch (e) {

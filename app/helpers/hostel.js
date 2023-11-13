@@ -1,11 +1,11 @@
 import { request } from "@lib/axios_util";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@UI/use-toast";
-import { GET_HOSTELS } from "@lib/Query_Keys";
+import { HOSTELS } from "@lib/Query_Keys";
 import { revalidateTag } from "next/cache";
-export const getHostels = () => {
+export const getHostels = (filters) => {
   return request({
-    url: `/api/manageHostel`,
+    url: `/api/manageHostel?startDate='2023-10-31T18:30:00.000Z'&&endDate='2023-11-13T17:40:47.266Z'`,
   });
 };
 
@@ -24,8 +24,8 @@ export function createHostelFn(cancelRef) {
       toast({
         title: "Hostel Added Successfully",
       });
-      queryClient.invalidateQueries([GET_HOSTELS]);
-      revalidateTag(GET_HOSTELS);
+      queryClient.invalidateQueries([HOSTELS]);
+      revalidateTag(HOSTELS);
       cancelRef.current.click();
     },
     onError: () => {
@@ -35,9 +35,10 @@ export function createHostelFn(cancelRef) {
     },
   });
 }
-export function getHostelsFn() {
+export function getHostelsFn(filters) {
   return useQuery({
-    queryKey: [GET_HOSTELS],
-    queryFn: () => getHostels(),
+    queryKey: [HOSTELS],
+    queryFn: () => getHostels(filters),
+    enabled: false,
   });
 }
