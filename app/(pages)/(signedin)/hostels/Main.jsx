@@ -7,12 +7,7 @@ import { cn } from "@lib/utils";
 import { getHostelsFn } from "@/app/helpers/hostel";
 
 function Main() {
-  const today = new Date();
-  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-
-  const filters = `startDate=${firstDay.toISOString()}`;
-
-  const { data: hostelsData } = getHostelsFn(filters);
+  const { data: hostelsData } = getHostelsFn();
 
   return (
     <>

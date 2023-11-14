@@ -1,16 +1,33 @@
 import { request } from "@lib/axios_util";
 import { useToast } from "@UI/use-toast";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { USERS } from "@lib/Query_Keys";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
-export const getUsers = (isTenant) => {
+export const getUsers = ({ isTenant, take = 10, pageParam }) => {
+  const url = `/api/manageTenant?isTenant=${!!isTenant}&&take=${take}${
+    pageParam ? `&&lastCursor=${pageParam}` : ""
+  }`;
   return request({
-    url: `/api/manageTenant?isTenant=${!!isTenant}`,
+    url: url,
   });
 };
 export function getUsersFn() {
-  return useQuery({
-    queryKey: ["users"],
-    queryFn: () => getUsers(),
+  return useInfiniteQuery({
+    queryKey: [USERS],
+    queryFn: ({ pageParam }) => {
+      if (pageParam === null) return;
+      return getUsers({ pageParam });
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      console.log(lastPage.data?.meta.nextId);
+      return lastPage.data.meta.nextId ?? false;
+    },
   });
 }
 export const getUserById = (id) => {

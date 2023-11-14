@@ -4,12 +4,13 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   useReactTable,
   getSortedRowModel,
 } from "@tanstack/react-table";
+import { useInView } from "react-intersection-observer";
 import { BsSearch } from "react-icons/bs";
 import { Input } from "@UI/input";
+import { Skeleton } from "@UI/skeleton";
 import {
   Table,
   TableBody,
@@ -19,9 +20,9 @@ import {
   TableRow,
 } from "@UI/table";
 import { Card, CardContent, CardFooter, CardTitle } from "@UI/card";
-import { DataTablePagination } from "./DataTablePagination";
 import { cn } from "@/app/lib/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
 export function DataTable({
   searchPlaceholder,
   filterColumn,
@@ -29,9 +30,12 @@ export function DataTable({
   columns,
   className,
   title,
-  pagination,
+  isFetchingNextPage,
+  fetchNextPage,
+  hasNextPage,
   sorting,
 }) {
+  const { ref, inView } = useInView();
   const [sortData, setSortData] = useState([]);
   const [columnFilters, setColumnFilters] = useState();
   let tableObj = {
@@ -44,6 +48,12 @@ export function DataTable({
       columnFilters,
     },
   };
+  useEffect(() => {
+    if (inView && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView]);
+
   if (sorting)
     tableObj = {
       ...tableObj,
@@ -52,8 +62,6 @@ export function DataTable({
       state: { ...tableObj.state, sorting: sortData },
     };
 
-  if (pagination)
-    tableObj = { ...tableObj, getPaginationRowModel: getPaginationRowModel() };
   const table = useReactTable(tableObj);
 
   return (
@@ -85,8 +93,8 @@ export function DataTable({
           </div>
         </CardTitle>
       )}
-      <CardContent className="pb-0">
-        <Table className="relative">
+      <CardContent className="pb-0 ">
+        <Table className="relative ">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -105,42 +113,36 @@ export function DataTable({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  className={row.original.isActive ? "" : "bg-primary"}
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
+          <TableBody className="overflow-auto p-96">
+            {table.getRowModel().rows.map((row) => (
+              <TableRow
+                className={row.original.isActive ? "" : "bg-primary"}
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
               </TableRow>
-            )}
+            ))}
           </TableBody>
         </Table>
       </CardContent>
-      {pagination && (
-        <CardFooter className="flex items-center justify-end space-x-2 py-2">
-          <DataTablePagination table={table} />
-        </CardFooter>
-      )}
+
+      <CardFooter className="flex items-center  py-2">
+        {isFetchingNextPage ? (
+          <div className="flex flex-row gap-2 items-center  transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted  dark:border-white/40 border-gray-600/60">
+            {table.getHeaderGroups()[0].headers.map((cell) => (
+              <Skeleton key={`dummyLoader${cell.id}`} className="w-40 h-10" />
+            ))}
+          </div>
+        ) : null}
+        <span style={{ visibility: "hidden" }} ref={ref}>
+          intersection observer marker
+        </span>
+      </CardFooter>
     </Card>
   );
 }

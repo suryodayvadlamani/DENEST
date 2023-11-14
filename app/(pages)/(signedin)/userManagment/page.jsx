@@ -1,17 +1,18 @@
 import Users from "@components/User/Users";
+import getQueryClient from "@lib/getQueryClient";
+import Hydrate from "@lib/Hydrate";
+import { USERS } from "@lib/Query_Keys";
+import { dehydrate } from "@tanstack/query-core";
 import { getUsers } from "@/app/server_functions/User";
-import { useStore } from "@/app/store/store";
-import StoreInitializer from "@/app/components/StoreInitializer";
 
 export default async function UserManagement() {
-  const { data } = await getUsers();
-
-  useStore.setState({ filter: {}, users: data });
+  const queryClient = getQueryClient();
+  //await queryClient.prefetchInfiniteQuery([USERS], () => getUsers());
+  const dehydratedState = dehydrate(queryClient);
 
   return (
-    <>
-      <StoreInitializer filter={{ nams: "" }} users={data} />
+    <Hydrate state={dehydratedState}>
       <Users />
-    </>
+    </Hydrate>
   );
 }

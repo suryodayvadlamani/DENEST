@@ -2,37 +2,18 @@ import { getServerSession } from "next-auth";
 import prisma from "../../../prisma/prisma";
 import { NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { limiter } from "../config/limiter";
 import { createRole } from "@/app/api/manageUserRole/route";
 import { MANAGER, TENANT } from "@lib/roleId";
 import { validateRole } from "@/app/helpers/validateRole";
 
 export async function POST(request) {
-  const origin = request.headers.get("origin");
-  const remaining = await limiter.removeTokens(1);
-  if (remaining < 0) {
+  const res = await validateRole();
+  if (res?.error)
     return NextResponse.json(
-      { message: "Too many requests" },
-      { status: 429 },
-      {
-        headers: {
-          "Access-Control-Allow-Origin": origin || "*",
-        },
-      }
+      { message: res.error },
+      { status: res.statusCode }
     );
-  }
   const session = await getServerSession(authOptions);
-
-  if (!session)
-    return NextResponse.json(
-      { message: "You don't have persmision!" },
-      { status: 401 }
-    );
-  if (session.role != "OWNER" && session.role != "ADMIN")
-    return NextResponse.json(
-      { message: "You are not authorized" },
-      { status: 403 }
-    );
 
   const {
     name,
@@ -89,32 +70,13 @@ export async function POST(request) {
 }
 
 export async function PUT(request) {
-  const origin = request.headers.get("origin");
-  const remaining = await limiter.removeTokens(1);
-
-  if (remaining < 0) {
+  const res = await validateRole();
+  if (res?.error)
     return NextResponse.json(
-      { message: "Too many requests" },
-      { status: 429 },
-      {
-        headers: {
-          "Access-Control-Allow-Origin": origin || "*",
-        },
-      }
+      { message: res.error },
+      { status: res.statusCode }
     );
-  }
   const session = await getServerSession(authOptions);
-
-  if (!session)
-    return NextResponse.json(
-      { message: "You don't have permission!" },
-      { status: 401 }
-    );
-  if (session.role != "ADMIN")
-    return NextResponse.json(
-      { message: "You are not authorized" },
-      { status: 403 }
-    );
 
   const { id, ...request_data } = await request.json();
   try {
@@ -136,7 +98,6 @@ export async function PUT(request) {
 }
 
 export async function GET(request) {
-  console.log("Please dont call me");
   const session = await getServerSession(authOptions);
 
   const res = await validateRole();
@@ -153,23 +114,11 @@ export async function GET(request) {
     const paramData = new URLSearchParams(search);
 
     const isTenant = paramData.get("isTenant");
-    const take = paramData.get("take");
-    const lastCursor = paramData.get("lastCursor");
-    let options = {
-      take: take ? parseInt(take) : 30,
-      ...(lastCursor && {
-        skip: 1,
-        cursor: {
-          id: lastCursor,
-        },
-      }),
-      orderBy: {
-        user: {
-          isActive: "asc",
-        },
-      },
-    };
+    const take = parseInt(paramData.get("take")) || 5;
+    const lastCursor = paramData.get("lastCursor") || undefined;
 
+    let options = {};
+    console.log(session.role);
     switch (session.role) {
       case "ADMIN":
         options = {
@@ -224,8 +173,25 @@ export async function GET(request) {
       };
     }
 
-    const resp = await prisma.userRoles.findMany(options);
+    const totalRows = await prisma.userRoles.count({
+      where: options.where,
+    });
 
+    options = {
+      ...options,
+      take: parseInt(take),
+      ...(lastCursor && {
+        skip: 1,
+        cursor: {
+          id: lastCursor,
+        },
+      }),
+      orderBy: {
+        id: "asc",
+      },
+    };
+
+    const resp = await prisma.userRoles.findMany(options);
     const usersOccupied = await prisma.tenantRoom.findMany({
       where: {
         userId: { in: resp.map((ur) => ur.user.id) },
@@ -235,15 +201,20 @@ export async function GET(request) {
         rent: true,
       },
     });
-
+    console.log({ a: resp.length });
     return NextResponse.json(
-      resp.map((ur) => ({
-        ...ur.user,
-        assigned: usersOccupied.map((x) => x.userId).includes(ur.user.id),
-        rent: usersOccupied.filter((x) => x.userId == ur.user.id)[0]?.rent,
-        role: ur.role.name,
-        hostel: ur.hostel?.name,
-      })),
+      {
+        data: resp.map((ur) => ({
+          ...ur.user,
+          assigned: usersOccupied.map((x) => x.userId).includes(ur.user.id),
+          rent: usersOccupied.filter((x) => x.userId == ur.user.id)[0]?.rent,
+          role: ur.role.name,
+          hostel: ur.hostel?.name,
+        })),
+        meta: {
+          nextId: resp.length === take ? resp[take - 1].id : undefined,
+        },
+      },
 
       { status: 200 }
     );

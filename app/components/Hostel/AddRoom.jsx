@@ -23,20 +23,16 @@ import {
   SelectValue,
 } from "@UI/select";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { getHostels } from "@/app/server_functions/Hostels";
-import { createRoom } from "@/app/server_functions/Rooms";
+import { getHostelsFn } from "@/app/helpers/hostel";
+import { createRoomFn } from "@/app/helpers/room";
+
 const AddRoom = ({ selectedHostel, selectedFloor }) => {
   const roomSchema = roomModel.omit({ id: true });
-  const [hostelsData, setHostelsData] = useState([]);
+
+  const { data: hostelsData } = getHostelsFn();
+
   const cancelRef = useRef(null);
 
-  useEffect(() => {
-    async function getData() {
-      const { isError, data } = await getHostels();
-      if (!isError) setHostelsData([...data]);
-    }
-    getData();
-  }, []);
   const form = useForm({
     resolver: zodResolver(roomSchema),
     defaultValues: {
@@ -48,14 +44,15 @@ const AddRoom = ({ selectedHostel, selectedFloor }) => {
       isActive: true,
     },
   });
-  const { formState } = form;
-  const { isSubmitting } = formState;
 
+  const { mutate: createRoom, isLoading: mutationLoading } =
+    createRoomFn(cancelRef);
   const onSubmit = async (data) => {
-    const { isError } = await createRoom(data);
-
-    if (!isError) {
-      cancelRef.current.click();
+    console.log({ data });
+    try {
+      createRoom(data);
+    } catch (error) {
+      console.log("Error creating Room ", error);
     }
   };
 
@@ -126,7 +123,7 @@ const AddRoom = ({ selectedHostel, selectedFloor }) => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {hostelsData?.map((hostel) => {
+                    {hostelsData?.data.map((hostel) => {
                       return (
                         <SelectItem key={hostel.id} value={`${hostel.id}`}>
                           {hostel.name}
@@ -160,8 +157,8 @@ const AddRoom = ({ selectedHostel, selectedFloor }) => {
             <Button
               type="submit"
               className="flex  justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6  "
-              isLoading={isSubmitting}
-              disabled={isSubmitting}
+              disabled={mutationLoading}
+              isLoading={mutationLoading}
             >
               Submit
             </Button>

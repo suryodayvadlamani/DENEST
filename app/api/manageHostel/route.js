@@ -42,7 +42,7 @@ export async function POST(request) {
         vendorId: session.user.vendorId,
       },
     });
-    return NextResponse.json({ message: "Hostel Registered" }, { status: 201 });
+    return NextResponse.json({ message: "Room Created" }, { status: 201 });
   } catch (err) {
     console.log(err);
     return NextResponse.json(

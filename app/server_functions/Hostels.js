@@ -4,7 +4,11 @@ import { HOSTELS, DUES } from "@/app/lib/Query_Keys";
 import nextFetch from "@/app/lib/nextFetch";
 import { revalidateTag } from "next/cache";
 
-export async function getHostels(filters) {
+export async function getHostels() {
+  const today = new Date();
+  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+  const filters = `startDate=${firstDay.toISOString()}`;
+
   try {
     const response = await nextFetch(`api/manageHostel?${filters}`, [HOSTELS]);
 

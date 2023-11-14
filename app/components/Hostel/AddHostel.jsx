@@ -11,7 +11,7 @@ import FormInput from "@components/Form/FormInput";
 import { Form, FormField, FormItem, FormLabel, FormControl } from "@UI/form";
 import { useRef } from "react";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { createHostel } from "@/app/server_functions/Hostels";
+import { createHostelFn } from "@/app/helpers/hostel";
 
 const AddHostel = () => {
   const cancelRef = useRef(null);
@@ -33,14 +33,11 @@ const AddHostel = () => {
     },
   });
 
-  const { formState } = form;
-  const { isSubmitting } = formState;
-  const formSubmit = async (formData) => {
-    const { isError } = await createHostel(formData);
+  const { mutate: createHostel, isLoading: mutationLoading } =
+    createHostelFn(cancelRef);
 
-    if (!isError) {
-      cancelRef.current.click();
-    }
+  const formSubmit = (formData) => {
+    createHostel(formData);
   };
   return (
     <div className="sm:mx-auto sm:w-full sm:max-w-sm px-6 py-6">
@@ -96,8 +93,8 @@ const AddHostel = () => {
             <Button
               className="flex  justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6  "
               type="submit"
-              isLoading={isSubmitting}
-              disabled={isSubmitting}
+              disabled={mutationLoading}
+              isLoading={mutationLoading}
             >
               Submit
             </Button>

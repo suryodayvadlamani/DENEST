@@ -37,7 +37,7 @@ function HostelCard({ hostel }) {
             title="Add Room"
             triggerTitle="+Add Room"
           >
-            <AddRoom />
+            <AddRoom selectedHostel={hostel.id} />
           </FormDialog>
         </div>
         <div className="flex md:w-2/3 flex-col md:flex-row gap-2">

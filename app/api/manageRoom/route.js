@@ -2,19 +2,17 @@ import { getServerSession } from "next-auth";
 import prisma from "../../../prisma/prisma";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { NextResponse } from "next/server";
+import { validateRole } from "@/app/helpers/validateRole";
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
 
-  if (!session)
+  const res = await validateRole();
+
+  if (res?.error)
     return NextResponse.json(
-      { message: "You don't have permission!" },
-      { status: 401 }
-    );
-  if (!["OWNER", "ADMIN"].includes(session.role))
-    return NextResponse.json(
-      { message: "You are not authorized" },
-      { status: 401 }
+      { message: res.error },
+      { status: res.statusCode }
     );
 
   const { title, capacity, roomType, floorId, isActive, hostelId } =

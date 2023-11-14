@@ -1,7 +1,6 @@
 "use client";
 
-import { LuMoreHorizontal, LuArrowDownUp } from "react-icons/lu";
-
+import { LuMoreHorizontal } from "react-icons/lu";
 import { Button } from "@UI/button";
 import {
   DropdownMenu,
@@ -11,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from "@UI/dropdown-menu";
 import { DataTableColumnHeader } from "@components/DataTable/DataTableColumnHeader";
-import { putCall } from "@/app/helpers/httpHelper";
 import { useRouter } from "next/navigation";
 import { deleteUser } from "@/app/server_functions/User";
 
