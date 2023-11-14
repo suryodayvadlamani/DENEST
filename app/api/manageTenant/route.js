@@ -118,7 +118,7 @@ export async function GET(request) {
     const lastCursor = paramData.get("lastCursor") || undefined;
 
     let options = {};
-    console.log(session.role);
+
     switch (session.role) {
       case "ADMIN":
         options = {
@@ -201,7 +201,7 @@ export async function GET(request) {
         rent: true,
       },
     });
-    console.log({ a: resp.length });
+
     return NextResponse.json(
       {
         data: resp.map((ur) => ({

@@ -113,7 +113,7 @@ export function DataTable({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody className="overflow-auto p-96">
+          <TableBody>
             {table.getRowModel().rows.map((row) => (
               <TableRow
                 className={row.original.isActive ? "" : "bg-primary"}
