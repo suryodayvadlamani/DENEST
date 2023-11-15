@@ -22,7 +22,7 @@ function Users() {
     () => usersData?.pages?.flatMap((page) => page.data.data) ?? [],
     [usersData?.pages]
   );
-  console.log(usersData?.pages, flatData);
+
   const tblColumns = useMemo(() => columns, []);
   return (
     <>

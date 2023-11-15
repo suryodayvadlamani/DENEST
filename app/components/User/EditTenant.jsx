@@ -13,28 +13,14 @@ import UserForm from "@components/UserForm";
 import AddressForm from "@components/AddressForm";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import { updateUserByIdFn } from "@/app/helpers/user";
-import { useStore } from "@/app/store/store";
-import { getUserById, updateUser } from "@/app/server_functions/User";
+import { updateUser } from "@/app/server_functions/User";
 
+import { getUserByIdFn } from "@/app/helpers/user";
 const EditTenant = () => {
   const userSchema = userModel.omit({ id: true });
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
-  const usersData = useStore((state) => {
-    return state.users.filter((x) => x.id == userId)[0];
-  });
-
-  const [data, setData] = useState(usersData);
-  useEffect(() => {
-    const getData = async () => {
-      const { data: usersData } = await getUserById(userId);
-      setData(usersData);
-    };
-    if (!data) {
-      getData();
-    }
-  }, []);
+  const { data: userData } = getUserByIdFn(userId);
 
   const form = useForm({
     resolver: zodResolver(userSchema),
@@ -58,24 +44,24 @@ const EditTenant = () => {
   const { isSubmitting } = formState;
 
   useEffect(() => {
-    if (data) {
+    if (userData) {
       reset({
-        name: usersData.name,
-        email: usersData.email,
-        profession: usersData.profession,
-        aadhar: usersData.aadhar,
-        addressLine1: usersData.addressLine1,
-        addressLine2: usersData.addressLine2,
-        pincode: usersData.pincode,
-        district: usersData.district,
-        state: usersData.state,
-        country: usersData.country,
-        contact: usersData.contact,
-        isActive: usersData.isActive,
+        name: userData.data.name ?? "",
+        email: userData.data.email ?? "",
+        profession: userData.data.profession ?? "",
+        aadhar: userData.data.aadhar ?? "",
+        addressLine1: userData.data.addressLine1 ?? "",
+        addressLine2: userData.data.addressLine2 ?? "",
+        pincode: userData.data.pincode ?? "",
+        district: userData.data.district ?? "",
+        state: userData.data.state ?? "",
+        country: userData.data.country ?? "",
+        contact: userData.data.contact ?? "",
+        isActive: userData.data.isActive ?? "",
         createdDate: new Date(),
       });
     }
-  }, [data]);
+  }, [userData]);
 
   const route = useRouter();
   const goBack = (e) => {

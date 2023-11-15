@@ -1,4 +1,3 @@
-import React from "react";
 import { getHostels } from "@/app/server_functions/Hostels";
 import getQueryClient from "@lib/getQueryClient";
 import Hydrate from "@lib/Hydrate";

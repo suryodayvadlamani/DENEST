@@ -20,7 +20,10 @@ import { useEffect, useState } from "react";
 import Room from "@components/Room/Room";
 import AddRoom from "@components/Hostel/AddRoom";
 import FormDialog from "@components/Form/FormDialog";
-function Hostel({ hostelsData }) {
+import { getHostelsFn } from "@/app/helpers/hostel";
+
+function Hostel() {
+  const { data: hostelsData } = getHostelsFn();
   const [selectedHostel, setSelectedHostel] = useState(hostelsData[0].id);
   const [selectedHostelRooms, setSelectedHostelRooms] = useState([]);
   const [selectedFloor, setSelectedFloor] = useState(1);

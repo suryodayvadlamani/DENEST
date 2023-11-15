@@ -1,6 +1,7 @@
 import { request } from "@lib/axios_util";
 import { useToast } from "@UI/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { VENDORS } from "@lib/Query_Keys";
 export const getVendors = (isActive) => {
   return request({
     url: `/api/manageVendor?isActive=${isActive}`,
@@ -8,7 +9,7 @@ export const getVendors = (isActive) => {
 };
 export function getVendorsFn(isActive = false) {
   return useQuery({
-    queryKey: ["vendors"],
+    queryKey: [VENDORS],
     queryFn: () => getVendorsFn(isActive),
   });
 }
@@ -21,12 +22,12 @@ export const getVendorById = (id) => {
 export function getVendorByIdFn(vendorId) {
   const queryClient = useQueryClient();
   return useQuery({
-    queryKey: ["vendor", vendorId],
+    queryKey: [VENDORS, vendorId],
     queryFn: () => getVendorByIdFn(vendorId),
     initialData: () => {
       return {
         data: queryClient
-          .getQueryData(["vendors"])
+          .getQueryData([VENDORS])
           ?.data.find((d) => d.id === vendorId),
       };
     },
@@ -48,7 +49,7 @@ export function updateVendorByIdFn() {
       toast({
         title: "Vendor Updated Successfully",
       });
-      queryClient.invalidateQueries(["vendors"]);
+      queryClient.invalidateQueries([VENDORS]);
     },
     onError: () => {
       toast({
@@ -72,7 +73,7 @@ export function createVendorFn() {
       toast({
         title: "Vendor Added Successfully",
       });
-      queryClient.invalidateQueries(["vendors"]);
+      queryClient.invalidateQueries([VENDORS]);
       cancelRef.current.click();
     },
     onError: () => {

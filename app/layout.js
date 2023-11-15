@@ -6,6 +6,7 @@ import { Toaster } from "@UI/toaster";
 import { siteConfig } from "@/config/site";
 import TanstackProvider from "@components/providers/TanstackProvider";
 const inter = Inter({ subsets: ["latin"] });
+export const dynamic = "force-dynamic";
 export const metadata = {
   title: {
     default: siteConfig.name,

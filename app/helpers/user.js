@@ -25,7 +25,6 @@ export function getUsersFn() {
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      console.log(lastPage.data?.meta.nextId);
       return lastPage.data.meta.nextId ?? false;
     },
   });
@@ -38,15 +37,8 @@ export const getUserById = (id) => {
 export function getUserByIdFn(userId) {
   const queryClient = useQueryClient();
   return useQuery({
-    queryKey: ["user", userId],
+    queryKey: [USERS, userId],
     queryFn: () => getUserById(userId),
-    initialData: () => {
-      return {
-        data: queryClient
-          .getQueryData(["users"])
-          ?.data.find((d) => d.id === userId),
-      };
-    },
   });
 }
 export const updateUserById = ({ id, data }) => {
