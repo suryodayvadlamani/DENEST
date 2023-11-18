@@ -22,6 +22,20 @@ export function getTenantPayFn() {
     queryFn: () => getTenantPay(),
   });
 }
+
+export const getTenantPayById = (id) => {
+  return request({
+    url: `/api/manageTenantPay/${id}`,
+  });
+};
+
+export function getTenantPayByIdFn(tenantPayId) {
+  const queryClient = useQueryClient();
+  return useQuery({
+    queryKey: [TENANT_PAY, tenantPayId],
+    queryFn: () => getTenantPayById(tenantPayId),
+  });
+}
 export function createTenantPayFn(cancelRef) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -56,7 +70,7 @@ export function deleteTenantPayFn() {
       toast({
         title: "Tenant Payment Deleted Successfully",
       });
-      queryClient.invalidateQueries([Tenant_Pay]);
+      queryClient.invalidateQueries([TENANT_PAY]);
     },
     onError: () => {
       toast({

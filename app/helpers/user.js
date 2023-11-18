@@ -8,20 +8,19 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-export const getUsers = ({ isTenant, take = 10, pageParam }) => {
-  const url = `/api/manageTenant?isTenant=${!!isTenant}&&take=${take}${
+export const getUsers = ({ isTenant, take = 10, pageParam, isActive }) => {
+  const url = `/api/manageTenant?isActive=${isActive}&&isTenant=${!!isTenant}&&take=${take}${
     pageParam ? `&&lastCursor=${pageParam}` : ""
   }`;
   return request({
     url: url,
   });
 };
-export function getUsersFn() {
+export function getUsersFn(isActive) {
   return useInfiniteQuery({
-    queryKey: [USERS],
+    queryKey: [USERS, isActive],
     queryFn: ({ pageParam }) => {
-      if (pageParam === null) return;
-      return getUsers({ pageParam });
+      return getUsers({ pageParam, isActive: isActive });
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {

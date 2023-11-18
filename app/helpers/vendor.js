@@ -24,7 +24,6 @@ export function getVendorsFn() {
   return useInfiniteQuery({
     queryKey: [VENDORS],
     queryFn: ({ pageParam }) => {
-      if (pageParam === null) return;
       return getVendors({ pageParam });
     },
     initialPageParam: 1,
@@ -40,10 +39,9 @@ export const getVendorById = (id) => {
   });
 };
 export function getVendorByIdFn(vendorId) {
-  const queryClient = useQueryClient();
   return useQuery({
     queryKey: [VENDORS, vendorId],
-    queryFn: () => getVendorByIdFn(vendorId),
+    queryFn: () => getVendorById(vendorId),
   });
 }
 

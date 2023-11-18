@@ -24,6 +24,7 @@ export default async function nextFetch(url, tags, method = "GET", body) {
 
     return data;
   } catch (err) {
+    console.log({ err });
     return { err };
   }
 }

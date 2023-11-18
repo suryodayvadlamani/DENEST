@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Input } from "@UI/input";
 import { Button } from "@UI/button";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,8 +34,21 @@ import { getVendorsFn } from "@/app/helpers/vendor";
 const page = () => {
   const [selectedRoles, setSelectedRoles] = useState([]);
   const { status, data: session } = useSession({ required: true });
-  const { isLoading, data, isError, error } = getRolesFn();
-  const { data: vendorData } = getVendorsFn(session?.role !== "ADMIN");
+  const { data } = getRolesFn();
+  const {
+    isFetchingNextPage,
+    isLoading,
+    isError,
+    data: vendorData,
+    error,
+    fetchNextPage,
+    hasNextPage,
+  } = getVendorsFn();
+
+  const flatData = useMemo(() => {
+    if (!vendorData?.pages[0]) return [];
+    return vendorData?.pages?.flatMap((page) => page?.data?.data) ?? [];
+  }, [vendorData?.pages]);
 
   useEffect(() => {
     function select_role() {
@@ -158,7 +171,7 @@ const page = () => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {vendorData?.data.map((vendor) => {
+                        {flatData?.map((vendor) => {
                           return (
                             <SelectItem key={vendor.id} value={`${vendor.id}`}>
                               {vendor.name}

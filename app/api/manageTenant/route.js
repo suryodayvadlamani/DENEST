@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import prisma from "../../../prisma/prisma";
 import { NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { createRole } from "@/app/api/manageUserRole/route";
+import { createRole, findRole } from "@/app/api/manageUserRole/route";
 import { MANAGER, TENANT } from "@lib/roleId";
 import { validateRole } from "@/app/helpers/validateRole";
 
@@ -87,6 +87,48 @@ export async function PUT(request) {
       data: { ...request_data },
     });
 
+    if (request_data.isActive) {
+      const ur = await findRole(
+        {
+          AND: {
+            userId: { equals: id },
+            isActive: { equals: false },
+          },
+        },
+        {
+          orderBy: {
+            expired: "desc",
+          },
+        }
+      );
+      await prisma.userRoles.update({
+        where: {
+          AND: {
+            id: { equals: ur[0].id },
+            isActive: { equals: true },
+          },
+        },
+        data: {
+          isActive: true,
+          expired: null,
+        },
+      });
+    } else {
+      const ur = await findRole({
+        AND: {
+          userId: { equals: id },
+          isActive: { equals: true },
+        },
+      });
+      await prisma.userRoles.update({
+        where: { id: ur[0].id },
+        data: {
+          isActive: false,
+          expired: new Date(),
+        },
+      });
+    }
+
     return NextResponse.json({ message: "Tenant deleted" }, { status: 201 });
   } catch (err) {
     console.log(err);
@@ -101,6 +143,7 @@ export async function GET(request) {
   const session = await getServerSession(authOptions);
 
   const res = await validateRole();
+
   if (res?.error)
     return NextResponse.json(
       { message: res.error },
@@ -113,8 +156,9 @@ export async function GET(request) {
     } = request;
     const paramData = new URLSearchParams(search);
 
+    const isActive = paramData.get("isActive") == "true";
     const isTenant = paramData.get("isTenant");
-    const take = parseInt(paramData.get("take")) || 5;
+    const take = parseInt(paramData.get("take")) || 10;
     const lastCursor = paramData.get("lastCursor") || undefined;
 
     let options = {};
@@ -128,6 +172,7 @@ export async function GET(request) {
             hostel: true,
             role: true,
           },
+          where: { isActive: isActive },
         };
         break;
       case "OWNER":
@@ -135,6 +180,7 @@ export async function GET(request) {
           ...options,
           where: {
             AND: [
+              { isActive: isActive },
               { vendorId: session.user.vendorId },
               {
                 OR: [{ roleId: TENANT }, { roleId: MANAGER }],
@@ -152,7 +198,11 @@ export async function GET(request) {
         options = {
           ...options,
           where: {
-            AND: [{ hostelId: session.user.hostelId }, { roleId: TENANT }],
+            AND: [
+              { isActive: isActive },
+              { hostelId: session.user.hostelId },
+              { roleId: TENANT },
+            ],
           },
           include: {
             user: true,
@@ -168,7 +218,11 @@ export async function GET(request) {
       options = {
         ...options,
         where: {
-          AND: [{ ...options.where }, { roleId: TENANT }],
+          AND: [
+            { ...options.where },
+            { isActive: isActive },
+            { roleId: TENANT },
+          ],
         },
       };
     }
@@ -192,6 +246,7 @@ export async function GET(request) {
     };
 
     const resp = await prisma.userRoles.findMany(options);
+
     const usersOccupied = await prisma.tenantRoom.findMany({
       where: {
         userId: { in: resp.map((ur) => ur.user.id) },
@@ -221,6 +276,7 @@ export async function GET(request) {
       flatRoomData[x.id] = x.room.title;
       return x;
     });
+
     return NextResponse.json(
       {
         data: resp.map((ur) => ({

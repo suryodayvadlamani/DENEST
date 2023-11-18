@@ -9,31 +9,19 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@UI/form";
 import FormInput from "@components/Form/FormInput";
 import UserForm from "@components/UserForm";
 import AddressForm from "@components/AddressForm";
-import { updateVendorByIdFn } from "@/app/helpers/vendor";
+import { updateVendorByIdFn, getVendorByIdFn } from "@/app/helpers/vendor";
 import { useRouter } from "next/navigation";
 import { Switch } from "@UI/switch";
-import { useStore } from "@/app/store/store";
-import { getVendorById, updateVendor } from "@/app/server_functions/Vendor";
 
 const EditVendor = () => {
   const userSchema = vendorModel.omit({ id: true });
   const searchParams = useSearchParams();
   const vendorId = searchParams.get("id");
-  const vendorData = useStore((state) => {
-    return state.vendors.filter((x) => x.id == vendorId)[0];
-  });
-  const [data, setData] = useState(vendorData);
 
-  useEffect(() => {
-    const getData = async () => {
-      const { data: vendorData } = await getVendorById(vendorId);
+  const { data: vendorData } = getVendorByIdFn(vendorId);
 
-      setData(vendorData);
-    };
-    if (!data) {
-      getData();
-    }
-  }, []);
+  const { mutate: updateVendor, isLoading: mutationLoading } =
+    updateVendorByIdFn();
   const router = useRouter();
 
   const form = useForm({
@@ -54,26 +42,25 @@ const EditVendor = () => {
     },
   });
 
-  const { formState, reset } = form;
-  const { isSubmitting } = formState;
+  const { reset } = form;
   useEffect(() => {
-    if (data) {
+    if (vendorData?.data) {
       reset({
-        GSTIN: data.GSTIN,
-        name: data.name,
-        email: data.email,
-        aadhar: data.aadhar,
-        addressLine1: data.addressLine1,
-        addressLine2: data.addressLine2,
-        pincode: data.pincode,
-        district: data.district,
-        state: data.state,
-        country: data.country,
-        contact: data.contact,
-        isActive: data.isActive,
+        GSTIN: vendorData.data.GSTIN,
+        name: vendorData.data.name,
+        email: vendorData.data.email,
+        aadhar: vendorData.data.aadhar,
+        addressLine1: vendorData.data.addressLine1,
+        addressLine2: vendorData.data.addressLine2,
+        pincode: vendorData.data.pincode,
+        district: vendorData.data.district,
+        state: vendorData.data.state,
+        country: vendorData.data.country,
+        contact: vendorData.data.contact,
+        isActive: vendorData.data.isActive,
       });
     }
-  }, [data]);
+  }, [vendorData?.data]);
 
   const goBack = (e) => {
     e.preventDefault();
@@ -82,9 +69,8 @@ const EditVendor = () => {
   };
 
   const onSubmit = async (formData) => {
-    const { isError } = await updateVendor(vendorId, formData);
-
-    if (!isError) router.replace("/vendorManagment");
+    await updateVendor({ id: vendorId, data: { ...formData } });
+    router.replace("/vendorManagment");
   };
 
   return (
@@ -121,8 +107,8 @@ const EditVendor = () => {
           <div className="flex gap-3 justify-around">
             <Button
               type="submit"
-              disabled={isSubmitting}
-              isLoading={isSubmitting}
+              disabled={mutationLoading}
+              isLoading={mutationLoading}
               className="flex  justify-center gap-2"
             >
               Submit

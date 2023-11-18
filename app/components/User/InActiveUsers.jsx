@@ -1,39 +1,35 @@
 "use client";
 import { DataTable } from "@components/DataTable/DataTable";
-import { columns } from "./Columns";
+import { columns } from "@components/User/Columns";
+import AddTenant from "@components/User/AddTenant";
 import FormDialog from "@components/Form/FormDialog";
-import AddVendor from "./AddVendor";
-import { getVendorsFn } from "@/app/helpers/vendor";
+import { getUsersFn } from "@/app/helpers/user";
 import { useMemo } from "react";
 
-const Vendors = () => {
+function InActiveUsers() {
   const {
     isFetchingNextPage,
     isLoading,
     isError,
-    data: vendorData,
+    data: usersData,
     error,
     fetchNextPage,
     hasNextPage,
-  } = getVendorsFn();
+  } = getUsersFn("false");
 
-  const flatData = useMemo(() => {
-    if (!vendorData?.pages[0]) return [];
-    return vendorData?.pages?.flatMap((page) => page?.data?.data) ?? [];
-  }, [vendorData?.pages]);
+  const flatData1 = useMemo(() => {
+    if (!usersData?.pages[0]) return [];
+    return usersData?.pages?.flatMap((page) => page?.data?.data) ?? [];
+  }, [usersData?.pages]);
+
   const tblColumns = useMemo(() => columns, []);
   return (
     <>
-      <section className="flex flex-row gap-5 items-center">
-        <FormDialog title="Add Vendor" triggerTitle="+Add Vendor">
-          <AddVendor />
-        </FormDialog>
-      </section>
-
-      {flatData?.length > 0 && (
+      {flatData1?.length > 0 && (
         <DataTable
           columns={tblColumns}
-          data={flatData}
+          data={flatData1}
+          title={"Users"}
           filterColumn={"name"}
           searchPlaceholder={"Search Name"}
           isFetchingNextPage={isFetchingNextPage}
@@ -41,12 +37,11 @@ const Vendors = () => {
           fetchNextPage={fetchNextPage}
           hasNextPage={hasNextPage}
           sorting={true}
-          title={"Vendors"}
           className={"mt-4 flex-1"}
         />
       )}
     </>
   );
-};
+}
 
-export default Vendors;
+export default InActiveUsers;

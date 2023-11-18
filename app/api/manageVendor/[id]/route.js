@@ -79,7 +79,7 @@ export async function PUT(request, { params }) {
       { status: res.statusCode }
     );
 
-  const { id, ...request_data } = await request.json();
+  const { id: vid, ...request_data } = await request.json();
 
   try {
     const { id } = params;
@@ -90,7 +90,7 @@ export async function PUT(request, { params }) {
       data: { ...request_data },
     });
 
-    return NextResponse.json({ message: "Vendor Registered" }, { status: 201 });
+    return NextResponse.json({ message: "Vendor Updated" }, { status: 201 });
   } catch (err) {
     console.log(err);
     return NextResponse.json(
@@ -109,12 +109,8 @@ export async function GET(request, { params }) {
     );
 
   try {
-    const {
-      nextUrl: { search },
-    } = request;
-    const { isActive } = new URLSearchParams(search);
     const { id } = params;
-    const whereClause = isActive ? { id, isActive: true } : { id };
+    const whereClause = { id };
 
     const resp = await prisma.vendor.findMany({
       where: whereClause,
