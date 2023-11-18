@@ -25,7 +25,7 @@ export function getUsersFn() {
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      return lastPage.data.meta.nextId ?? false;
+      return lastPage?.data?.meta?.nextId ?? false;
     },
   });
 }

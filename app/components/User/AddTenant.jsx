@@ -36,7 +36,7 @@ const AddTenant = () => {
   const userSchema = userModel.omit({ id: true, createdDate: true }).extend({
     hostelId: z.string(),
   });
-  const { status, data: session } = useSession({ required: true });
+  const { data: session } = useSession({ required: true });
   const cancelRef = useRef(null);
   const { toast } = useToast();
   const form = useForm({

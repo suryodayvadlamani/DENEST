@@ -18,10 +18,11 @@ function Users() {
     fetchNextPage,
     hasNextPage,
   } = getUsersFn();
-  const flatData = useMemo(
-    () => usersData?.pages?.flatMap((page) => page.data.data) ?? [],
-    [usersData?.pages]
-  );
+
+  const flatData = useMemo(() => {
+    if (!usersData?.pages[0]) return [];
+    return usersData?.pages?.flatMap((page) => page?.data?.data) ?? [];
+  }, [usersData?.pages]);
 
   const tblColumns = useMemo(() => columns, []);
   return (

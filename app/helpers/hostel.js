@@ -5,7 +5,7 @@ import { HOSTELS } from "@lib/Query_Keys";
 
 export const getHostels = (filters) => {
   return request({
-    url: `/api/manageHostel?startDate='2023-10-31T18:30:00.000Z'&&endDate='2023-11-13T17:40:47.266Z'`,
+    url: `/api/manageHostel?${filters}`,
   });
 };
 
@@ -45,6 +45,5 @@ export function getHostelsFn() {
   return useQuery({
     queryKey: [HOSTELS],
     queryFn: () => getHostels(filters),
-    enabled: false,
   });
 }

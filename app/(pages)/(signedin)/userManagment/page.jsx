@@ -7,7 +7,7 @@ import { getUsers } from "@/app/server_functions/User";
 
 export default async function UserManagement() {
   const queryClient = getQueryClient();
-  //await queryClient.prefetchInfiniteQuery([USERS], () => getUsers());
+  await queryClient.prefetchInfiniteQuery([USERS], () => getUsers());
   const dehydratedState = dehydrate(queryClient);
 
   return (

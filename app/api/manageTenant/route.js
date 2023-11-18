@@ -198,14 +198,37 @@ export async function GET(request) {
       },
       select: {
         userId: true,
+        bedId: true,
         rent: true,
       },
     });
-
+    const bedIds = usersOccupied.map((x) => x.bedId);
+    const RoomData = await prisma.Bed.findMany({
+      where: {
+        id: { in: bedIds },
+      },
+      select: {
+        id: true,
+        room: {
+          select: {
+            title: true,
+          },
+        },
+      },
+    });
+    const flatRoomData = {};
+    RoomData.map((x) => {
+      flatRoomData[x.id] = x.room.title;
+      return x;
+    });
     return NextResponse.json(
       {
         data: resp.map((ur) => ({
           ...ur.user,
+          roomName:
+            flatRoomData[
+              usersOccupied.filter((x) => x.userId == ur.user.id)[0]?.bedId
+            ],
           assigned: usersOccupied.map((x) => x.userId).includes(ur.user.id),
           rent: usersOccupied.filter((x) => x.userId == ur.user.id)[0]?.rent,
           role: ur.role.name,
