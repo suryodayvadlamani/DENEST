@@ -1,16 +1,31 @@
 import { request } from "@lib/axios_util";
 import { useToast } from "@UI/use-toast";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import { VENDORS } from "@lib/Query_Keys";
-export const getVendors = (isActive) => {
+export const getVendors = ({ isVendor, take = 10, pageParam }) => {
+  const url = `/api/manageVendor?isVendor=${!!isVendor}&&take=${take}${
+    pageParam ? `&&lastCursor=${pageParam}` : ""
+  }`;
   return request({
-    url: `/api/manageVendor?isActive=${isActive}`,
+    url: url,
   });
 };
-export function getVendorsFn(isActive = false) {
-  return useQuery({
+export function getVendorsFn() {
+  return useInfiniteQuery({
     queryKey: [VENDORS],
-    queryFn: () => getVendorsFn(isActive),
+    queryFn: ({ pageParam }) => {
+      if (pageParam === null) return;
+      return getVendors({ pageParam });
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      return lastPage?.data?.meta?.nextId ?? false;
+    },
   });
 }
 

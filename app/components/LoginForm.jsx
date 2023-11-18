@@ -42,10 +42,12 @@ const LoginForm = () => {
         redirect: false,
       });
 
-      if (res?.error) {
+      console.log({ callbackUrl, res });
+      if (res?.status != 200) {
         setError("Invalid Credentials");
         return;
       }
+
       router.replace(callbackUrl || "/hostels");
     } catch (error) {
       console.log("Login Form error", error);

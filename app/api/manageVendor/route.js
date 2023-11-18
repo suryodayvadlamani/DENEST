@@ -119,6 +119,7 @@ export async function PUT(request) {
 }
 
 export async function GET(request) {
+  const session = await getServerSession(authOptions);
   const res = await validateRole(true);
   if (res?.error)
     return NextResponse.json(
@@ -130,15 +131,40 @@ export async function GET(request) {
     const {
       nextUrl: { search },
     } = request;
-    const { isActive } = new URLSearchParams(search);
+    const paramData = new URLSearchParams(search);
 
-    const whereClause = isActive ? { isActive: true } : {};
+    const take = parseInt(paramData.get("take")) || 5;
+    const lastCursor = paramData.get("lastCursor") || undefined;
+    let options = {};
+    options = isActive ? { isActive: true } : {};
+
+    options = {
+      ...options,
+      take: parseInt(take),
+      ...(lastCursor && {
+        skip: 1,
+        cursor: {
+          id: lastCursor,
+        },
+      }),
+      orderBy: {
+        id: "asc",
+      },
+    };
 
     const resp = await prisma.vendor.findMany({
-      where: whereClause,
+      where: options,
     });
 
-    return NextResponse.json(resp, { status: 200 });
+    return NextResponse.json(
+      {
+        data: resp,
+        meta: {
+          nextId: resp.length === take ? resp[take - 1].id : undefined,
+        },
+      },
+      { status: 200 }
+    );
   } catch (err) {
     console.log(err);
     return NextResponse.json(
