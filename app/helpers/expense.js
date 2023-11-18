@@ -1,7 +1,12 @@
 import { request } from "@lib/axios_util";
 import { useToast } from "@UI/use-toast";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { EXPENSES } from "@lib/Query_Keys";
 export const createExpense = (data) => {
   return request({
     url: `/api/manageExpense`,
@@ -9,20 +14,27 @@ export const createExpense = (data) => {
     data,
   });
 };
-export function getExpensesFn() {
+export function getExpensesFn(expenseType) {
   return useQuery({
-    queryKey: ["expenses"],
-    queryFn: () => getExpenses(),
+    queryKey: [EXPENSES, expenseType],
+    queryFn: () => getExpenses(expenseType),
+  });
+}
+export function getExpensesTypeFn(expenseType) {
+  return useInfiniteQuery({
+    queryKey: [EXPENSES, expenseType],
+    queryFn: () => getExpenses(expenseType),
+    enabled: expenseType != "",
   });
 }
 
-export const getExpenses = () => {
+export const getExpenses = (expenseType) => {
   return request({
-    url: `/api/manageExpense`,
+    url: `/api/manageExpense?expenseType=${expenseType}`,
   });
 };
 
-export function createExpenseFn() {
+export function createExpenseFn(cancelRef) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   return useMutation(createExpense, {
@@ -30,7 +42,7 @@ export function createExpenseFn() {
       toast({
         title: "Expense Added Successfully",
       });
-      queryClient.invalidateQueries(["expenses"]);
+      queryClient.invalidateQueries([EXPENSES]);
       cancelRef.current.click();
     },
     onError: () => {
@@ -48,7 +60,7 @@ export const deleteExpense = ({ id }) => {
     data: { id },
   });
 };
-export function deleteExpenseFn() {
+export function deleteExpenseFn(expenseType) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   return useMutation(deleteExpense, {
@@ -56,7 +68,8 @@ export function deleteExpenseFn() {
       toast({
         title: "Expense Deleted Successfully",
       });
-      queryClient.invalidateQueries(["expenses"]);
+      queryClient.invalidateQueries([EXPENSES, "All"]);
+      queryClient.invalidateQueries([EXPENSES, expenseType]);
     },
     onError: () => {
       toast({

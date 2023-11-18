@@ -3,6 +3,7 @@ import prisma from "../../../../prisma/prisma";
 import { NextResponse } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { limiter } from "../../config/limiter";
+import { validateRole } from "@/app/helpers/validateRole";
 
 export async function GET(request, { params }) {
   const origin = request.headers.get("origin");
@@ -49,35 +50,12 @@ export async function GET(request, { params }) {
 }
 
 export async function DELETE(request) {
-  const origin = request.headers.get("origin");
-  const remaining = await limiter.removeTokens(1);
+  const res = await validateRole();
 
-  if (remaining < 0) {
+  if (res?.error)
     return NextResponse.json(
-      { message: "Too many requests" },
-      { status: 429 },
-      {
-        headers: {
-          "Access-Control-Allow-Origin": origin || "*",
-        },
-      }
-    );
-  }
-  const session = await getServerSession(authOptions);
-
-  if (!session)
-    return NextResponse.json(
-      { message: "You don't have permission!" },
-      { status: 401 }
-    );
-  if (
-    session.role != "ADMIN" &&
-    session.role != "OWNER" &&
-    session.role != "MANAGER"
-  )
-    return NextResponse.json(
-      { message: "You are not authorized" },
-      { status: 403 }
+      { message: res.error },
+      { status: res.statusCode }
     );
 
   const { id } = await request.json();

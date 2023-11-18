@@ -30,10 +30,6 @@ const AddTenantPay = () => {
     },
   });
 
-  const {
-    formState: { errors },
-  } = form;
-  console.log(errors);
   const { isLoading, data: userData, isError, error } = getUsersFn();
   const queryClient = useQueryClient();
   const { toast } = useToast();

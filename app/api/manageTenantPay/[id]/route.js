@@ -70,37 +70,12 @@ export async function POST(request) {
 }
 
 export async function DELETE(request) {
-  const origin = request.headers.get("origin");
-  const remaining = await limiter.removeTokens(1);
-
-  if (remaining < 0) {
+  const res = await validateRole();
+  if (res?.error)
     return NextResponse.json(
-      { message: "Too many requests" },
-      { status: 429 },
-      {
-        headers: {
-          "Access-Control-Allow-Origin": origin || "*",
-        },
-      }
+      { message: res.error },
+      { status: res.statusCode }
     );
-  }
-  const session = await getServerSession(authOptions);
-
-  if (!session)
-    return NextResponse.json(
-      { message: "You don't have permission!" },
-      { status: 401 }
-    );
-  if (
-    session.role != "ADMIN" &&
-    session.role != "OWNER" &&
-    session.role != "MANAGER"
-  )
-    return NextResponse.json(
-      { message: "You are not authorized" },
-      { status: 403 }
-    );
-
   const { id } = await request.json();
 
   try {
@@ -115,6 +90,78 @@ export async function DELETE(request) {
       { status: 200 }
     );
   } catch (err) {
+    return NextResponse.json(
+      { message: "Sorry not a lucky day try again" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET(request, { params }) {
+  const res = await validateRole();
+  if (res?.error)
+    return NextResponse.json(
+      { message: res.error },
+      { status: res.statusCode }
+    );
+  try {
+    const {
+      nextUrl: { search },
+    } = request;
+
+    const { id } = params;
+
+    const resp = await prisma.tenantPay.findMany({
+      where: { id },
+      select: {
+        amount: true,
+        paymentType: true,
+        startDate: true,
+        endDate: true,
+        paidDate: true,
+        userId: true,
+        user: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json(resp[0], { status: 200 });
+  } catch (err) {
+    console.log(err);
+    return NextResponse.json(
+      { message: "Sorry not a lucky day try again" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(request) {
+  const res = await validateRole();
+  if (res?.error)
+    return NextResponse.json(
+      { message: res.error },
+      { status: res.statusCode }
+    );
+
+  const { id, ...request_data } = await request.json();
+  try {
+    await prisma.tenantPay.update({
+      where: {
+        id: id,
+      },
+      data: { ...request_data },
+    });
+
+    return NextResponse.json(
+      { message: "Tenant Pay Updated" },
+      { status: 201 }
+    );
+  } catch (err) {
+    console.log(err);
     return NextResponse.json(
       { message: "Sorry not a lucky day try again" },
       { status: 500 }

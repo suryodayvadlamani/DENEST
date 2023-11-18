@@ -4,7 +4,7 @@ import nextFetch from "@/app/lib/nextFetch";
 
 export async function getExpense() {
   try {
-    const response = await nextFetch("/api/manageExpense", [EXPENSES]);
+    const response = await nextFetch("/api/manageExpense", [EXPENSES, ""]);
 
     return { isError: false, data: response };
   } catch (e) {

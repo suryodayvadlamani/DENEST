@@ -3,6 +3,7 @@ import prisma from "../../../prisma/prisma";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { NextResponse } from "next/server";
 import { limiter } from "../config/limiter";
+import { validateRole } from "@/app/helpers/validateRole";
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
@@ -57,36 +58,75 @@ export async function POST(request) {
 }
 
 export async function GET(request) {
-  const origin = request.headers.get("origin");
-  const remaining = await limiter.removeTokens(1);
-  if (remaining < 0) {
-    return NextResponse.json(
-      { message: "Too many requests" },
-      { status: 429 },
-      {
-        headers: {
-          "Access-Control-Allow-Origin": origin || "*",
-        },
-      }
-    );
-  }
   const session = await getServerSession(authOptions);
-  if (!session)
+
+  const res = await validateRole();
+
+  if (res?.error)
     return NextResponse.json(
-      { message: "You don't have persmision!" },
-      { status: 401 }
+      { message: res.error },
+      { status: res.statusCode }
     );
-  if (
-    session.role !== "ADMIN" &&
-    session.role !== "OWNER" &&
-    session.role !== "MANAGER"
-  )
-    return NextResponse.json(
-      { message: "You are not authorized" },
-      { status: 403 }
-    );
+
   try {
-    const resp = await prisma.tenantPay.findMany({
+    const {
+      nextUrl: { search },
+    } = request;
+    const paramData = new URLSearchParams(search);
+
+    const isTenant = paramData.get("isTenant");
+    const take = parseInt(paramData.get("take")) || 10;
+    const lastCursor = paramData.get("lastCursor") || undefined;
+
+    let options = {};
+
+    switch (session.role) {
+      case "ADMIN":
+        options = {
+          ...options,
+        };
+        break;
+      case "OWNER":
+        options = {
+          ...options,
+          where: {
+            AND: [
+              { vendorId: session.user.vendorId },
+              {
+                OR: [{ roleId: TENANT }, { roleId: MANAGER }],
+              },
+            ],
+          },
+        };
+        break;
+      case "MANAGER":
+        options = {
+          ...options,
+          where: {
+            AND: [{ hostelId: session.user.hostelId }, { roleId: TENANT }],
+          },
+        };
+        break;
+      default:
+        break;
+    }
+
+    options = {
+      ...options,
+      take: parseInt(take),
+      ...(lastCursor && {
+        skip: 1,
+        cursor: {
+          id: lastCursor,
+        },
+      }),
+      orderBy: {
+        id: "asc",
+      },
+    };
+
+    options = {
+      ...options,
       include: {
         user: {
           include: {
@@ -102,12 +142,14 @@ export async function GET(request) {
           },
         },
       },
-    });
+    };
+    const resp = await prisma.tenantPay.findMany(options);
 
     return NextResponse.json(
-      resp.map((x) => {
-        return {
+      {
+        data: resp.map((x) => ({
           ...x,
+          isActive: true,
           advance: x.user.UserRoom[0].advance,
           roomName: x.user.UserRoom[0]?.bed.room.title,
           startDate: x.startDate.toLocaleDateString(),
@@ -115,8 +157,12 @@ export async function GET(request) {
           user: x.user.name,
           contact: x.user.contact,
           userId: x.user.id,
-        };
-      }),
+        })),
+        meta: {
+          nextId: resp.length === take ? resp[take - 1].id : undefined,
+        },
+      },
+
       { status: 200 }
     );
   } catch (err) {

@@ -34,6 +34,7 @@ export function DataTable({
   fetchNextPage,
   hasNextPage,
   sorting,
+  rowClick,
 }) {
   const { ref, inView } = useInView();
   const [sortData, setSortData] = useState([]);
@@ -61,7 +62,11 @@ export function DataTable({
       getSortedRowModel: getSortedRowModel(),
       state: { ...tableObj.state, sorting: sortData },
     };
-
+  const rowClicked = (rowData) => {
+    if (rowClick) {
+      rowClick(rowData);
+    }
+  };
   const table = useReactTable(tableObj);
 
   return (
@@ -114,19 +119,35 @@ export function DataTable({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow
-                className={row.original?.isActive ? "" : "bg-primary"}
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+            {table.getRowModel().rows.length > 0 ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  onClick={() => rowClicked(row.original)}
+                  className={
+                    row.original?.isActive
+                      ? ""
+                      : row.original?.isActive == false
+                      ? "bg-primary"
+                      : ""
+                  }
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell>No Data to show</TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </CardContent>

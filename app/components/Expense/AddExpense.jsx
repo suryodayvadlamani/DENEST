@@ -26,7 +26,8 @@ function AddExpense({ hostelsData }) {
     },
   });
 
-  const { mutate: postExpense, isLoading: mutationLoading } = createExpenseFn();
+  const { mutate: postExpense, isLoading: mutationLoading } =
+    createExpenseFn(cancelRef);
   const onSubmit = async (data) => {
     try {
       postExpense(data);

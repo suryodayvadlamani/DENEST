@@ -67,7 +67,7 @@ export const columns = [
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               onClick={() => {
-                router.push(`/vendorManagment/editVendor?id=${tenant.userId}`);
+                router.push(`/hostels/tenantpay/edit?id=${tenant.id}`);
               }}
             >
               Edit
