@@ -100,8 +100,15 @@ export async function GET(request) {
         },
         Rooms: {
           select: {
+            title: true,
+            floorId: true,
+            id: true,
+            capacity: true,
+            roomType: true,
             Beds: {
               select: {
+                id: true,
+                title: true,
                 occupied: true,
               },
             },

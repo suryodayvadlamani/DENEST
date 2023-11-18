@@ -24,21 +24,22 @@ import { getHostelsFn } from "@/app/helpers/hostel";
 
 function Hostel() {
   const { data: hostelsData } = getHostelsFn();
-  const [selectedHostel, setSelectedHostel] = useState(hostelsData[0].id);
+
+  const [selectedHostel, setSelectedHostel] = useState(hostelsData.data[0].id);
   const [selectedHostelRooms, setSelectedHostelRooms] = useState([]);
   const [selectedFloor, setSelectedFloor] = useState(1);
 
   useEffect(() => {
     setSelectedHostelRooms(() => {
-      return hostelsData
+      return hostelsData.data
         .filter((x) => x.id == selectedHostel)[0]
         .Rooms?.filter((room) => room.floorId == selectedFloor);
     });
-  }, [hostelsData, selectedFloor, selectedHostel]);
+  }, [hostelsData.data, selectedFloor, selectedHostel]);
   const form = useForm({
     defaultValues: {
       floorId: "1",
-      hostelId: hostelsData[0].id,
+      hostelId: hostelsData.data[0].id,
     },
   });
 
@@ -58,6 +59,7 @@ function Hostel() {
                   <FormLabel>Hostel</FormLabel>
                   <Select
                     onValueChange={(e) => {
+                      console.log(e);
                       setSelectedHostel(e);
                       field.onChange(e);
                     }}
@@ -69,7 +71,7 @@ function Hostel() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {hostelsData?.map((hostel) => {
+                      {hostelsData.data?.map((hostel) => {
                         return (
                           <SelectItem key={hostel.id} value={`${hostel.id}`}>
                             {hostel.name}
@@ -103,7 +105,7 @@ function Hostel() {
                     <SelectContent>
                       {Array.from(
                         {
-                          length: hostelsData.filter(
+                          length: hostelsData.data.filter(
                             (x) => x.id == selectedHostel
                           )[0]?.floors,
                         },
