@@ -9,7 +9,7 @@ import { dehydrate } from "@tanstack/query-core";
 
 const VendorManagment = async () => {
   const queryClient = getQueryClient();
-  await queryClient.prefetchQuery([VENDORS], () => getVendors());
+  await queryClient.prefetchInfiniteQuery([VENDORS], () => getVendors());
   const dehydratedState = dehydrate(queryClient);
   return (
     <Hydrate state={dehydratedState}>

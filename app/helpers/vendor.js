@@ -7,8 +7,13 @@ import {
   useInfiniteQuery,
 } from "@tanstack/react-query";
 import { VENDORS } from "@lib/Query_Keys";
-export const getVendors = ({ isVendor, take = 10, pageParam }) => {
-  const url = `/api/manageVendor?isVendor=${!!isVendor}&&take=${take}${
+export const getVendors = ({
+  isActive = false,
+  isVendor,
+  take = 10,
+  pageParam,
+}) => {
+  const url = `/api/manageVendor?isActive=${isActive}&&isVendor=${!!isVendor}&&take=${take}${
     pageParam ? `&&lastCursor=${pageParam}` : ""
   }`;
   return request({
@@ -39,13 +44,6 @@ export function getVendorByIdFn(vendorId) {
   return useQuery({
     queryKey: [VENDORS, vendorId],
     queryFn: () => getVendorByIdFn(vendorId),
-    initialData: () => {
-      return {
-        data: queryClient
-          .getQueryData([VENDORS])
-          ?.data.find((d) => d.id === vendorId),
-      };
-    },
   });
 }
 

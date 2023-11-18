@@ -133,10 +133,11 @@ export async function GET(request) {
     } = request;
     const paramData = new URLSearchParams(search);
 
-    const take = parseInt(paramData.get("take")) || 5;
+    const isActive = parseInt(paramData.get("isActive"));
+    const take = parseInt(paramData.get("take")) || 10;
     const lastCursor = paramData.get("lastCursor") || undefined;
     let options = {};
-    options = isActive ? { isActive: true } : {};
+    const wherClause = isActive ? { isActive: true } : {};
 
     options = {
       ...options,
@@ -153,7 +154,8 @@ export async function GET(request) {
     };
 
     const resp = await prisma.vendor.findMany({
-      where: options,
+      where: wherClause,
+      ...options,
     });
 
     return NextResponse.json(
