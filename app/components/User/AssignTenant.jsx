@@ -47,10 +47,6 @@ const AssignTenant = ({ bedId }) => {
       endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 10)),
     },
   });
-  const { status, data: session } = useSession({ required: true });
-
-  const route = useRouter();
-  const { data: userData } = getUsersFn();
 
   const { mutate: updateTenantRom, isLoading: mutationLoading } =
     updateTenantRoomFn(cancelRef);
