@@ -55,7 +55,7 @@ export function updateUserByIdFn() {
       toast({
         title: "Tenant Updated Successfully",
       });
-      queryClient.invalidateQueries(["users"]);
+      queryClient.invalidateQueries([USERS]);
     },
     onError: () => {
       toast({
@@ -79,7 +79,7 @@ export function createUserFn(cancelRef) {
       toast({
         title: "User Added Successfully",
       });
-      queryClient.invalidateQueries(["users"]);
+      queryClient.invalidateQueries([USERS]);
       cancelRef.current.click();
     },
     onError: () => {
@@ -89,3 +89,30 @@ export function createUserFn(cancelRef) {
     },
   });
 }
+
+export function deleteUserByIdFn() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  return useMutation(deleteUserById, {
+    onSuccess: () => {
+      toast({
+        title: "User Deleted Successfully",
+      });
+      queryClient.invalidateQueries([USERS, "false"]);
+      queryClient.invalidateQueries([USERS, "true"]);
+    },
+    onError: () => {
+      toast({
+        title: "Sorry Something went wrong",
+      });
+    },
+  });
+}
+
+export const deleteUserById = (data) => {
+  return request({
+    url: `/api/manageTenant`,
+    method: "PUT",
+    data,
+  });
+};

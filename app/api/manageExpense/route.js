@@ -62,7 +62,11 @@ export async function GET(request) {
     const paramData = new URLSearchParams(search);
 
     const expenseType = paramData.get("expenseType");
+    const searchParams = request.nextUrl.searchParams;
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
 
+    console.log({ startDate, endDate }, "ghj");
     let whereClause = {};
 
     switch (session.role) {
@@ -77,11 +81,45 @@ export async function GET(request) {
       where: { ...whereClause },
     });
     const hostelIds = resp.map((ur) => ur.hostelId).filter((x) => x != null);
-    if (expenseType != "All") {
+    let timeFilter = {};
+    const chck = [null, "undefined"];
+    if (!chck.includes(startDate) && !chck.includes(endDate)) {
+      console.log({ startDate, endDate });
+      timeFilter = {
+        AND: [
+          {
+            expenseDate: {
+              lte: endDate,
+            },
+          },
+          {
+            expenseDate: {
+              gte: startDate,
+            },
+          },
+        ],
+      };
+    } else if (!chck.includes(endDate)) {
+      timeFilter = {
+        expenseDate: {
+          lte: endDate,
+        },
+      };
+    } else if (!chck.includes(startDate)) {
+      timeFilter = {
+        expenseDate: {
+          gte: startDate,
+        },
+      };
+    }
+    if (expenseType && expenseType != "All") {
       resp = await prisma.expense.findMany({
         where: {
-          hostelId: { in: hostelIds },
-          expenseType: expenseType,
+          AND: [
+            { hostelId: { in: hostelIds } },
+            { expenseType: expenseType },
+            timeFilter,
+          ],
         },
       });
     } else {
@@ -91,10 +129,11 @@ export async function GET(request) {
           amount: true,
         },
         where: {
-          hostelId: { in: hostelIds },
+          AND: [{ hostelId: { in: hostelIds } }, timeFilter],
         },
       });
     }
+    console.log(resp);
     return NextResponse.json(resp, { status: 200 });
   } catch (err) {
     console.log(err);

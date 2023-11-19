@@ -25,6 +25,11 @@ function Tenantpay() {
   const tblColumns = useMemo(() => columns, []);
   return (
     <>
+      <section className="flex flex-row gap-5 items-center">
+        <FormDialog title="Add TenantPayment" triggerTitle="Add TenantPayment">
+          <AddTenantPay />
+        </FormDialog>
+      </section>
       {flatData?.length > 0 && (
         <DataTable
           columns={tblColumns}

@@ -30,7 +30,7 @@ const actionColumn = {
         <DropdownMenuContent align="end">
           <DropdownMenuItem
             onClick={() => {
-              router.push(`/vendorManagment/editVendor?id=${expense.id}`);
+              router.push(`/hostels/expenses/edit?id=${expense.id}`);
             }}
           >
             Edit

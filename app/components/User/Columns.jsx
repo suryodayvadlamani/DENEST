@@ -12,6 +12,7 @@ import {
 import { DataTableColumnHeader } from "@components/DataTable/DataTableColumnHeader";
 import { useRouter } from "next/navigation";
 import { deleteUser } from "@/app/server_functions/User";
+import { deleteUserById, deleteUserByIdFn } from "@/app/helpers/user";
 
 export const columns = [
   {
@@ -51,6 +52,8 @@ export const columns = [
     cell: ({ row }) => {
       const router = useRouter();
       const user = row.original;
+      const { mutate: deleteUserById, isLoading: mutationLoading } =
+        deleteUserByIdFn();
 
       return (
         <DropdownMenu>
@@ -77,7 +80,7 @@ export const columns = [
             <DropdownMenuItem
               onClick={async () => {
                 try {
-                  await deleteUser({
+                  await deleteUserById({
                     id: user.id,
                     isActive: !user.isActive,
                   });

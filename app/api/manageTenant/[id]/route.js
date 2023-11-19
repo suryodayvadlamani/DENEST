@@ -134,3 +134,28 @@ export async function GET(request, { params }) {
     );
   }
 }
+
+export async function DELETE(request) {
+  const res = await validateRole();
+  if (res?.error)
+    return NextResponse.json(
+      { message: res.error },
+      { status: res.statusCode }
+    );
+  const { id } = await request.json();
+
+  try {
+    await prisma.user.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    return NextResponse.json({ message: "Tenant Deleted" }, { status: 200 });
+  } catch (err) {
+    return NextResponse.json(
+      { message: "Sorry not a lucky day try again" },
+      { status: 500 }
+    );
+  }
+}

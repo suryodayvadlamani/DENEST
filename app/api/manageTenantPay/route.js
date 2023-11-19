@@ -2,8 +2,8 @@ import { getServerSession } from "next-auth";
 import prisma from "../../../prisma/prisma";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { NextResponse } from "next/server";
-import { limiter } from "../config/limiter";
 import { validateRole } from "@/app/helpers/validateRole";
+import { MANAGER, TENANT } from "@lib/roleId";
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
@@ -24,6 +24,30 @@ export async function POST(request) {
   const { amount, paymentType, startDate, endDate, userId, paidDate } =
     post_data;
   try {
+    const user = await prisma.user.findMany({
+      where: {
+        contact: userId,
+      },
+    });
+    if (user.length < 0)
+      return NextResponse.json(
+        { message: "Sorry not a lucky day try again" },
+        { status: 500 }
+      );
+    const userRole = await prisma.userRoles.findMany({
+      where: {
+        userId: user[0].id,
+      },
+      select: {
+        roleId: true,
+      },
+    });
+    if (userRole[0].roleId !== TENANT)
+      if (user.length < 0)
+        return NextResponse.json(
+          { message: "Sorry not a lucky day try again" },
+          { status: 500 }
+        );
     await prisma.tenantPay.create({
       data: {
         amount,
@@ -31,18 +55,18 @@ export async function POST(request) {
         startDate,
         endDate,
         paidDate,
-        userId: userId || session.user.userId,
+        userId: user[0].id || session.user.userId,
       },
     });
     await prisma.dues.upsert({
-      where: { userId: userId },
+      where: { userId: user[0].id },
       update: {
         amount: {
           increment: -1 * amount,
         },
       },
       create: {
-        userId: userId,
+        userId: user[0].id,
         amount: -1 * amount,
         createdBy: "System",
       },
@@ -79,7 +103,7 @@ export async function GET(request) {
     const lastCursor = paramData.get("lastCursor") || undefined;
 
     let options = {};
-
+    let whereClause = {};
     switch (session.role) {
       case "ADMIN":
         options = {
@@ -87,8 +111,7 @@ export async function GET(request) {
         };
         break;
       case "OWNER":
-        options = {
-          ...options,
+        whereClause = {
           where: {
             AND: [
               { vendorId: session.user.vendorId },
@@ -100,8 +123,7 @@ export async function GET(request) {
         };
         break;
       case "MANAGER":
-        options = {
-          ...options,
+        whereClause = {
           where: {
             AND: [{ hostelId: session.user.hostelId }, { roleId: TENANT }],
           },
@@ -110,9 +132,18 @@ export async function GET(request) {
       default:
         break;
     }
+    const users = await prisma.userRoles.findMany({
+      ...whereClause,
+      select: {
+        userId: true,
+      },
+    });
 
     options = {
       ...options,
+      where: {
+        userId: { in: users.map((x) => x.userId) },
+      },
       take: parseInt(take),
       ...(lastCursor && {
         skip: 1,
@@ -149,7 +180,6 @@ export async function GET(request) {
       {
         data: resp.map((x) => ({
           ...x,
-          isActive: true,
           advance: x.user.UserRoom[0].advance,
           roomName: x.user.UserRoom[0]?.bed.room.title,
           startDate: x.startDate.toLocaleDateString(),

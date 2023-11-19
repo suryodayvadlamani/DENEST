@@ -19,7 +19,6 @@ export async function deleteUser(data) {
     const response = await nextFetch("/api/manageTenant", "", "PUT", data);
     revalidateTag([USERS, "false"]);
     redirect(`userManagment?activeTab=inactive`);
-    return { isError: false, data: response };
   } catch (e) {
     console.log("what error", e);
     return { isError: true, data: "Failed to read" };

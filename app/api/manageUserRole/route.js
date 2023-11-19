@@ -3,6 +3,7 @@ import prisma from "../../../prisma/prisma";
 import { NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { limiter } from "../config/limiter";
+import { validateRole } from "@/app/helpers/validateRole";
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
@@ -36,6 +37,7 @@ export async function POST(request) {
     }
   }
   let data = {};
+
   switch (roleName) {
     case "ADMIN":
       data = {
@@ -56,6 +58,16 @@ export async function POST(request) {
       };
       break;
     case "MANAGER":
+      data = {
+        userId: userData[0].id,
+        roleId,
+        isActive,
+        vendorId,
+        hostelId,
+        created: new Date(),
+      };
+      break;
+    case "TENANT":
       data = {
         userId: userData[0].id,
         roleId,

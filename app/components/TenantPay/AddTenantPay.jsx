@@ -3,11 +3,8 @@
 import React, { useRef } from "react";
 import { createTenantPayFn } from "@/app/helpers/tenantpay";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getUsersFn } from "@/app/helpers/user";
 import { useForm } from "react-hook-form";
-import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@UI/button";
-import { useToast } from "@UI/use-toast";
 import FormInput from "@components/Form/FormInput";
 import FormCalendar from "@components/Form/FormCalendar";
 import FormSelect from "@components/Form/FormSelect";
@@ -30,10 +27,6 @@ const AddTenantPay = () => {
     },
   });
 
-  const { isLoading, data: userData, isError, error } = getUsersFn();
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
   const { mutate: postTenantPay, isLoading: mutationLoading } =
     createTenantPayFn(cancelRef);
 
@@ -50,16 +43,16 @@ const AddTenantPay = () => {
       <div className="sm:mx-auto sm:w-full sm:max-w-sm px-6 py-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className=" space-y-6">
-            <FormSelect
+            <FormInput
+              className="mb-3"
               name="userId"
               form={form}
               id="userId"
-              label="Tenant"
-              options={userData?.data?.map((user) => {
-                return { value: user.id, title: user.name };
-              })}
+              type="tel"
+              maxLength="10"
+              minLength="10"
+              label="Contact"
             />
-
             <FormInput
               className="mb-3"
               name="amount"

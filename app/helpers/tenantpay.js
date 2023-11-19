@@ -16,15 +16,24 @@ export const createTenantPay = (data) => {
   });
 };
 
-export const getTenantPay = () => {
+export const getTenantPay = ({ take = 10, pageParam }) => {
+  const url = `/api/manageTenantPay?&&take=${take}${
+    pageParam ? `&&lastCursor=${pageParam}` : ""
+  }`;
   return request({
-    url: `/api/manageTenantPay`,
+    url: url,
   });
 };
 export function getTenantPayFn() {
   return useInfiniteQuery({
     queryKey: [TENANT_PAY],
-    queryFn: () => getTenantPay(),
+    queryFn: ({ pageParam }) => {
+      return getTenantPay({ pageParam });
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      return lastPage?.data?.meta?.nextId ?? false;
+    },
   });
 }
 

@@ -4,7 +4,7 @@ import { Button } from "@UI/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { tenantRoomModel } from "../../../prisma/zod";
-
+import { z } from "zod";
 import FormInput from "@components/Form/FormInput";
 import {
   Form,
@@ -29,7 +29,9 @@ import { useSession } from "next-auth/react";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { useRef } from "react";
 const AssignTenant = ({ bedId }) => {
-  const userSchema = tenantRoomModel.omit({ id: true });
+  const userSchema = tenantRoomModel.omit({ id: true }).extend({
+    tenantContact: z.string(),
+  });
   const cancelRef = useRef(null);
   const { toast } = useToast();
   const form = useForm({
@@ -51,7 +53,7 @@ const AssignTenant = ({ bedId }) => {
   const { data: userData } = getUsersFn();
 
   const { mutate: updateTenantRom, isLoading: mutationLoading } =
-    updateTenantRoomFn();
+    updateTenantRoomFn(cancelRef);
 
   const onSubmit = async (data) => {
     try {
