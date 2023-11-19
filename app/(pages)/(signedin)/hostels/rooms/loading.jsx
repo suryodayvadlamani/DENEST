@@ -17,11 +17,7 @@ const loading = () => {
       </div>
       <div className="grid lg:grid-cols-2  items-center gap-3 mt-3">
         <Card className="w-full h-96 items-center justify-center flex cursor-pointer ">
-          <CardHeader className="w-full h-full">
-            <CardContent className="w-full h-full">
-              <Skeleton className="w-full h-full" />
-            </CardContent>
-          </CardHeader>
+          <Skeleton className="w-full h-full" />
         </Card>
       </div>
     </div>
