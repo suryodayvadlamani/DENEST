@@ -23,11 +23,7 @@ function FormSelect({ name, form, options, id, label }) {
       render={({ field }) => (
         <FormItem id={`formItem${name}`} className="relative pt-2">
           <FormControl>
-            <Select
-              id={id}
-              onValueChange={field.onChange}
-              defaultValue={field.value}
-            >
+            <Select id={id} onValueChange={field.onChange} value={field.value}>
               <SelectTrigger>
                 <SelectValue placeholder={label} />
               </SelectTrigger>

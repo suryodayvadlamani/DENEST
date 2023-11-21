@@ -2,59 +2,69 @@ import { getServerSession } from "next-auth";
 import prisma from "../../../prisma/prisma";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { NextResponse } from "next/server";
+import { validateRole } from "@/app/helpers/validateRole";
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
 
-  if (!session)
+  const res = await validateRole();
+
+  if (res?.error)
     return NextResponse.json(
-      { message: "You don't have permission!" },
-      { status: 401 }
-    );
-  if (!["OWNER", "ADMIN", "MANAGER"].includes(session.role))
-    return NextResponse.json(
-      { message: "You are not authorized" },
-      { status: 401 }
+      { message: res.error },
+      { status: res.statusCode }
     );
 
   const d = await request.json();
 
-  const { rent, advance, userId, bedId } = d;
+  const { rent, advance, tenantContact, bedId } = d;
+
   try {
+    const userId = await prisma.user.findMany({
+      where: {
+        contact: tenantContact,
+      },
+    });
+
     const userTenantRoom = await prisma.tenantRoom.findMany({
       where: {
-        AND: [{ userId }, { isActive: true }],
+        AND: [{ userId: userId[0].id }, { isActive: true }],
       },
     });
-    await prisma.tenantRoom.updateMany({
-      where: {
-        AND: [{ userId }, { isActive: true }],
-      },
-      data: {
-        isActive: false,
-        endDate: new Date(),
-      },
-    });
-    userTenantRoom.forEach(async (utr) => {
+
+    if (userTenantRoom.length > 0) {
+      await prisma.tenantRoom.updateMany({
+        where: {
+          AND: [{ userId: userId[0].id }, { isActive: true }],
+        },
+        data: {
+          isActive: false,
+          endDate: new Date(),
+        },
+      });
+
       await prisma.bed.update({
         where: {
-          id: utr.bedId,
+          id: userTenantRoom[0].bedId,
         },
         data: {
           occupied: false,
         },
       });
-    });
+    }
 
-    await prisma.tenantRoom.create({
+    const s = await prisma.tenantRoom.create({
       data: {
         rent,
         advance,
-        userId,
+        userId: userId[0].id,
         bedId,
+        isActive: true,
+        startDate: new Date(),
         endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
       },
     });
+
     await prisma.bed.update({
       where: {
         id: bedId,
@@ -63,6 +73,7 @@ export async function POST(request) {
         occupied: true,
       },
     });
+
     return NextResponse.json({ message: "Room Registered" }, { status: 201 });
   } catch (err) {
     console.log(err);

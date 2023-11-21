@@ -1,6 +1,7 @@
 import { request } from "@lib/axios_util";
 import { useToast } from "@UI/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { HOSTELS } from "@lib/Query_Keys";
 export const updateTenantRoom = (data) => {
   return request({
     url: `/api/manageTenantRoom`,
@@ -9,7 +10,7 @@ export const updateTenantRoom = (data) => {
   });
 };
 
-export function updateTenantRoomFn() {
+export function updateTenantRoomFn(cancelRef) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   return useMutation(updateTenantRoom, {
@@ -17,7 +18,8 @@ export function updateTenantRoomFn() {
       toast({
         title: "Tenant Room added Successfully",
       });
-      queryClient.invalidateQueries(["hostels"]);
+      queryClient.invalidateQueries([HOSTELS]);
+      cancelRef.current.click();
     },
     onError: () => {
       toast({

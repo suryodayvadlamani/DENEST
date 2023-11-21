@@ -4,7 +4,18 @@ import nextFetch from "@/app/lib/nextFetch";
 
 export async function getExpense() {
   try {
-    const response = await nextFetch("/api/manageExpense", [EXPENSES]);
+    const startDate = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      1
+    ).toISOString();
+
+    const endDate = from && new Date().toISOString();
+
+    const response = await nextFetch(
+      `/api/manageExpense?startDate=${startDate}&&endDate=${endDate}`,
+      [EXPENSES, ""]
+    );
 
     return { isError: false, data: response };
   } catch (e) {

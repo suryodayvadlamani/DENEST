@@ -42,11 +42,13 @@ const LoginForm = () => {
         redirect: false,
       });
 
-      if (res?.error) {
+      console.log({ callbackUrl, res });
+      if (res?.status != 200) {
         setError("Invalid Credentials");
         return;
       }
-      router.replace(callbackUrl || "/dashboard");
+
+      router.replace(callbackUrl || "/hostels");
     } catch (error) {
       console.log("Login Form error", error);
     }
@@ -113,7 +115,7 @@ const LoginForm = () => {
             <Button
               key={name}
               className="gap-2 capitalize"
-              onClick={() => signIn(name, { callbackUrl: "/dashboard" })}
+              onClick={() => signIn(name, { callbackUrl: "/hostels" })}
             >
               <Icon />
               {name}

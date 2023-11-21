@@ -1,7 +1,6 @@
 "use client";
 
-import { LuMoreHorizontal, LuArrowDownUp } from "react-icons/lu";
-
+import { LuMoreHorizontal } from "react-icons/lu";
 import { Button } from "@UI/button";
 import {
   DropdownMenu,
@@ -11,13 +10,18 @@ import {
   DropdownMenuTrigger,
 } from "@UI/dropdown-menu";
 import { DataTableColumnHeader } from "@components/DataTable/DataTableColumnHeader";
-import { putCall } from "@/app/helpers/httpHelper";
 import { useRouter } from "next/navigation";
+import { deleteUser } from "@/app/server_functions/User";
+import { deleteUserById, deleteUserByIdFn } from "@/app/helpers/user";
 
 export const columns = [
   {
     accessorKey: "name",
     header: "Name",
+  },
+  {
+    accessorKey: "roomName",
+    header: "RoomName",
   },
   {
     accessorKey: "hostel",
@@ -48,6 +52,8 @@ export const columns = [
     cell: ({ row }) => {
       const router = useRouter();
       const user = row.original;
+      const { mutate: deleteUserById, isLoading: mutationLoading } =
+        deleteUserByIdFn();
 
       return (
         <DropdownMenu>
@@ -74,23 +80,16 @@ export const columns = [
             <DropdownMenuItem
               onClick={async () => {
                 try {
-                  const res = await putCall(
-                    "api/manageTenant",
-                    {
-                      id: user.id,
-                      isActive: false,
-                    },
-                    {
-                      "Content-Type": "application/json",
-                      "Access-Control-Allow-Origin": "*",
-                    }
-                  );
+                  await deleteUserById({
+                    id: user.id,
+                    isActive: !user.isActive,
+                  });
                 } catch (error) {
                   console.log("Error during registration: ", error);
                 }
               }}
             >
-              Delete
+              {user.isActive ? "Delete" : "Activate"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

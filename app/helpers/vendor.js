@@ -1,15 +1,35 @@
 import { request } from "@lib/axios_util";
 import { useToast } from "@UI/use-toast";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-export const getVendors = (isActive) => {
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
+import { VENDORS } from "@lib/Query_Keys";
+export const getVendors = ({
+  isActive = false,
+  isVendor,
+  take = 10,
+  pageParam,
+}) => {
+  const url = `/api/manageVendor?isActive=${isActive}&&isVendor=${!!isVendor}&&take=${take}${
+    pageParam ? `&&lastCursor=${pageParam}` : ""
+  }`;
   return request({
-    url: `/api/manageVendor?isActive=${isActive}`,
+    url: url,
   });
 };
-export function getVendorsFn(isActive = false) {
-  return useQuery({
-    queryKey: ["vendors"],
-    queryFn: () => getVendorsFn(isActive),
+export function getVendorsFn() {
+  return useInfiniteQuery({
+    queryKey: [VENDORS],
+    queryFn: ({ pageParam }) => {
+      return getVendors({ pageParam });
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      return lastPage?.data?.meta?.nextId ?? false;
+    },
   });
 }
 
@@ -19,17 +39,9 @@ export const getVendorById = (id) => {
   });
 };
 export function getVendorByIdFn(vendorId) {
-  const queryClient = useQueryClient();
   return useQuery({
-    queryKey: ["vendor", vendorId],
-    queryFn: () => getVendorByIdFn(vendorId),
-    initialData: () => {
-      return {
-        data: queryClient
-          .getQueryData(["vendors"])
-          ?.data.find((d) => d.id === vendorId),
-      };
-    },
+    queryKey: [VENDORS, vendorId],
+    queryFn: () => getVendorById(vendorId),
   });
 }
 
@@ -48,7 +60,7 @@ export function updateVendorByIdFn() {
       toast({
         title: "Vendor Updated Successfully",
       });
-      queryClient.invalidateQueries(["vendors"]);
+      queryClient.invalidateQueries([VENDORS]);
     },
     onError: () => {
       toast({
@@ -72,7 +84,7 @@ export function createVendorFn() {
       toast({
         title: "Vendor Added Successfully",
       });
-      queryClient.invalidateQueries(["vendors"]);
+      queryClient.invalidateQueries([VENDORS]);
       cancelRef.current.click();
     },
     onError: () => {

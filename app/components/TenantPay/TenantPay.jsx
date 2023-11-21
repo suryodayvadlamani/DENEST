@@ -3,25 +3,44 @@ import AddTenantPay from "@components/TenantPay/AddTenantPay";
 import { columns } from "@components/TenantPay/Columns";
 import { DataTable } from "@components/DataTable/DataTable";
 import FormDialog from "@components/Form/FormDialog";
-import { BsSearch } from "react-icons/bs";
-import { Input } from "@UI/input";
-import { Button } from "@UI/button";
+import { getTenantPayFn } from "@/app/helpers/tenantpay";
+import { useMemo } from "react";
 
-function Tenantpay({ data }) {
+function Tenantpay() {
+  const {
+    isFetchingNextPage,
+    isLoading,
+    isError,
+    data: tenantPayData,
+    error,
+    fetchNextPage,
+    hasNextPage,
+  } = getTenantPayFn();
+
+  const flatData = useMemo(() => {
+    if (!tenantPayData?.pages[0]) return [];
+    return tenantPayData?.pages?.flatMap((page) => page?.data?.data) ?? [];
+  }, [tenantPayData?.pages]);
+
+  const tblColumns = useMemo(() => columns, []);
   return (
     <>
-      <div className="flex flex-row gap-5 ml-10">
-        <Button variant="ghost">Total Payments : {data.length}</Button>
-
-        <FormDialog title="Add TenantPay" triggerTitle="Add Tenant Payment">
+      <section className="flex flex-row gap-5 items-center">
+        <FormDialog title="Add TenantPayment" triggerTitle="Add TenantPayment">
           <AddTenantPay />
         </FormDialog>
-      </div>
-      {data?.length > 0 && (
+      </section>
+      {flatData?.length > 0 && (
         <DataTable
-          columns={columns}
-          data={data}
-          pagination={true}
+          columns={tblColumns}
+          data={flatData}
+          title={"Tenant Payments"}
+          filterColumn={"contact"}
+          searchPlaceholder={"Search Contact"}
+          isFetchingNextPage={isFetchingNextPage}
+          isLoading={isLoading}
+          fetchNextPage={fetchNextPage}
+          hasNextPage={hasNextPage}
           sorting={true}
           className={"mt-4 flex-1"}
         />

@@ -3,43 +3,41 @@ import prisma from "../../../prisma/prisma";
 import { NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { limiter } from "../config/limiter";
+import { validateRole } from "@/app/helpers/validateRole";
 
 export async function POST(request) {
-  const origin = request.headers.get("origin");
-  const remaining = await limiter.removeTokens(1);
-  if (remaining < 0) {
-    return NextResponse.json(
-      { message: "Too many requests" },
-      { status: 429 },
-      {
-        headers: {
-          "Access-Control-Allow-Origin": origin || "*",
-        },
-      }
-    );
-  }
   const session = await getServerSession(authOptions);
 
-  if (!session)
+  const res = await validateRole();
+
+  if (res?.error)
     return NextResponse.json(
-      { message: "You don't have persmision!" },
-      { status: 401 }
-    );
-  if (
-    session.role != "ADMIN" &&
-    session.role != "MANAGER" &&
-    session.role != "OWNER"
-  )
-    return NextResponse.json(
-      { message: "You are not authorized" },
-      { status: 403 }
+      { message: res.error },
+      { status: res.statusCode }
     );
 
   const { userEmail, roleId, isActive, vendorId, hostelId, roleName } =
     await request.json();
 
   const userData = await prisma.user.findMany({ where: { email: userEmail } });
+  const roleInfo = await findRole({
+    AND: {
+      userId: { equals: userData[0].id },
+      isActive: { equals: isActive },
+    },
+  });
+  if (roleInfo.length > 0) {
+    if (roleInfo.roleId === roleId) {
+      return NextResponse.json({ message: "Role created" }, { status: 201 });
+    } else {
+      await updateRole(userData[0].id, {
+        isActive: false,
+        expired: new Date(),
+      });
+    }
+  }
   let data = {};
+
   switch (roleName) {
     case "ADMIN":
       data = {
@@ -69,15 +67,25 @@ export async function POST(request) {
         created: new Date(),
       };
       break;
+    case "TENANT":
+      data = {
+        userId: userData[0].id,
+        roleId,
+        isActive,
+        vendorId,
+        hostelId,
+        created: new Date(),
+      };
+      break;
   }
-  const res = await createRole(data);
+  const resp = await createRole(data);
 
-  if (res == 201)
+  if (resp == 201)
     return NextResponse.json({ message: "Hostel Registered" }, { status: 201 });
   else
     return NextResponse.json(
       { message: "Sorry not a lucky day try again" },
-      { status: res }
+      { status: resp }
     );
 }
 
@@ -93,17 +101,28 @@ export async function createRole(data) {
   }
 }
 
-export async function findRole() {
+export async function findRole(whereClause, sortClause) {
   try {
-    await prisma.userRoles.findMany({
+    let options = { where: { ...whereClause } };
+    if (sortClause) {
+      options = { ...options, orderBy: sortClause };
+    }
+    const resp = await prisma.userRoles.findMany(options);
+    return resp;
+  } catch (err) {
+    return 500;
+  }
+}
+export async function updateRole(userId, data) {
+  try {
+    const updateUser = await prisma.userRoles.update({
       where: {
-        AND: {
-          userId: { equals: userId },
-          isActive: { equals: isActive },
-        },
+        userId: { equals: userId },
       },
+      data,
     });
-    return 200;
+
+    return resp;
   } catch (err) {
     return 500;
   }

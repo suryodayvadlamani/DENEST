@@ -1,8 +1,8 @@
 import { request } from "@lib/axios_util";
-
 import { useToast } from "@UI/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { GET_HOSTELS } from "@lib/Query_Keys";
+import { HOSTELS, ROOMS } from "@lib/Query_Keys";
+
 export const getRoomsFn = (roomId) => {
   return request({
     url: `/api/manageRoom/${roomId}`,
@@ -25,8 +25,8 @@ export function createRoomFn(cancelRef) {
       toast({
         title: "Room Added Successfully",
       });
-      queryClient.invalidateQueries([GET_HOSTELS]);
-      queryClient.invalidateQueries(["rooms"]);
+      queryClient.invalidateQueries([HOSTELS]);
+      queryClient.invalidateQueries([ROOMS]);
       cancelRef.current.click();
     },
     onError: () => {

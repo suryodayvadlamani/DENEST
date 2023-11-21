@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Card,
   CardContent,
@@ -9,24 +9,24 @@ import {
 } from "@UI/card";
 import Bed from "@components/Bed/Bed";
 import { Button } from "@UI/button";
-import { createBed } from "@/app/server_functions/Bed";
+import { addBedFn } from "@/app/helpers/bed";
 
 function Room({ roomData }) {
-  const [loading, SetLoading] = useState(false);
-  const AddBed = async () => {
+  const { mutate: createBed, isLoading: mutationLoading } = addBedFn();
+
+  const AddBed = () => {
     try {
       const bedName =
         roomData?.Beds.length > 0
           ? parseInt(roomData?.Beds.slice(-1)[0]?.title.replace("Bed", "")) + 1
           : 1;
-      SetLoading(true);
-      await createBed({
+
+      createBed({
         title: `Bed${bedName}`,
         isActive: true,
         occupied: false,
         roomId: roomData.id,
       });
-      SetLoading(false);
     } catch (error) {
       console.log("Error during Bed Addition: ", error);
     }
@@ -46,7 +46,11 @@ function Room({ roomData }) {
       </CardContent>
       <CardFooter className="flex justify-end">
         {roomData?.Beds.length < roomData?.capacity && (
-          <Button isLoading={loading} disabled={loading} onClick={AddBed}>
+          <Button
+            isLoading={mutationLoading}
+            disabled={mutationLoading}
+            onClick={AddBed}
+          >
             +Add Bed
           </Button>
         )}

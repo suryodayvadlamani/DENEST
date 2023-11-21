@@ -1,5 +1,5 @@
 "use client";
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { Button } from "@UI/button";
 import FormInput from "@components/Form/FormInput";
 import UserFormLoader from "@components/loaders/UserForm";
@@ -13,16 +13,15 @@ import UserForm from "@components/UserForm";
 import AddressForm from "@components/AddressForm";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getUserByIdFn, updateUserByIdFn } from "@/app/helpers/user";
+import { updateUser } from "@/app/server_functions/User";
 
+import { getUserByIdFn } from "@/app/helpers/user";
 const EditTenant = () => {
   const userSchema = userModel.omit({ id: true });
-  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
-  const { data } = getUserByIdFn();
-  const { toast } = useToast();
+  const { data: userData } = getUserByIdFn(userId);
+
   const form = useForm({
     resolver: zodResolver(userSchema),
     defaultValues: {
@@ -32,53 +31,48 @@ const EditTenant = () => {
       aadhar: "",
       addressLine1: "",
       addressLine2: "",
-      pinCode: "",
+      pincode: "",
       district: "",
       state: "",
       country: "",
       contact: "",
-      isActive: false,
+      isActive: "",
       createdDate: new Date(),
     },
   });
-  const {
-    reset,
-    formState: { errors },
-  } = form;
+  const { formState, reset } = form;
+  const { isSubmitting } = formState;
 
   useEffect(() => {
-    if (data) {
+    if (userData) {
       reset({
-        name: data?.data.name,
-        email: data?.data.email,
-        profession: data?.data.profession,
-        aadhar: data?.data.aadhar,
-        addressLine1: data?.data.addressLine1,
-        addressLine2: data?.data.addressLine2,
-        pincode: data?.data.pincode,
-        district: data?.data.district,
-        state: data?.data.state,
-        country: data?.data.country,
-        contact: data?.data.contact,
-        isActive: data?.data.isActive,
+        name: userData.data.name ?? "",
+        email: userData.data.email ?? "",
+        profession: userData.data.profession ?? "",
+        aadhar: userData.data.aadhar ?? "",
+        addressLine1: userData.data.addressLine1 ?? "",
+        addressLine2: userData.data.addressLine2 ?? "",
+        pincode: userData.data.pincode ?? "",
+        district: userData.data.district ?? "",
+        state: userData.data.state ?? "",
+        country: userData.data.country ?? "",
+        contact: userData.data.contact ?? "",
+        isActive: userData.data.isActive ?? "",
         createdDate: new Date(),
       });
     }
-  }, [data]);
+  }, [userData]);
+
   const route = useRouter();
   const goBack = (e) => {
     e.preventDefault();
-    route.replace("/userManagment");
+    route.replace("/userManagment", { scroll: false });
   };
 
-  const {
-    mutate: updateUser,
-    isLoading: mutationLoading,
-    isSuccess,
-  } = updateUserByIdFn();
-  if (isSuccess) route.replace("/userManagment");
-  const onSubmit = (data) => {
-    updateUser({ id: userId, data: data });
+  const onSubmit = async (formData) => {
+    const { isError } = await updateUser(userId, formData);
+
+    if (!isError) route.replace("/userManagment");
   };
 
   return (
@@ -125,13 +119,14 @@ const EditTenant = () => {
             />
             <div className="flex gap-3 justify-around">
               <Button
-                className="flex  justify-center gap-2"
-                disabled={mutationLoading}
                 type="submit"
-                isLoading={mutationLoading}
+                disabled={isSubmitting}
+                isLoading={isSubmitting}
+                className="flex  justify-center gap-2"
               >
-                Update
+                Submit
               </Button>
+
               <Button
                 className="flex w-20 justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6  "
                 onClick={(e) => goBack(e)}

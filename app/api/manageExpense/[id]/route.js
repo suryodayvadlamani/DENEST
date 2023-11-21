@@ -3,42 +3,36 @@ import prisma from "../../../../prisma/prisma";
 import { NextResponse } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { limiter } from "../../config/limiter";
+import { validateRole } from "@/app/helpers/validateRole";
 
 export async function GET(request, { params }) {
-  const origin = request.headers.get("origin");
-  const remaining = await limiter.removeTokens(1);
-  if (remaining < 0) {
+  const res = await validateRole();
+  if (res?.error)
     return NextResponse.json(
-      { message: "Too many requests" },
-      { status: 429 },
-      {
-        headers: {
-          "Access-Control-Allow-Origin": origin || "*",
-        },
-      }
+      { message: res.error },
+      { status: res.statusCode }
     );
-  }
-  const session = await getServerSession(authOptions);
-  if (!session)
-    return NextResponse.json(
-      { message: "You don't have persmision!" },
-      { status: 401 }
-    );
-  //   if (session.user.role !== "ADMIN" || session.user.role !== "OWNER")
-  //     return NextResponse.json(
-  //       { message: "You are not authorized" },
-  //       { status: 403 }
-  //     );
+
   try {
     const { id } = params;
 
-    const resp = await prisma.room.findMany({
+    const resp = await prisma.expense.findMany({
       where: { id },
-      include: {
-        Beds: true,
+      select: {
+        amount: true,
+        expenseType: true,
+        description: true,
+        expenseDate: true,
+        hostelId: true,
+        hostel: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
       },
     });
-    return NextResponse.json(resp, { status: 200 });
+    return NextResponse.json(resp[0], { status: 200 });
   } catch (err) {
     console.log(err);
     return NextResponse.json(
@@ -49,35 +43,12 @@ export async function GET(request, { params }) {
 }
 
 export async function DELETE(request) {
-  const origin = request.headers.get("origin");
-  const remaining = await limiter.removeTokens(1);
+  const res = await validateRole();
 
-  if (remaining < 0) {
+  if (res?.error)
     return NextResponse.json(
-      { message: "Too many requests" },
-      { status: 429 },
-      {
-        headers: {
-          "Access-Control-Allow-Origin": origin || "*",
-        },
-      }
-    );
-  }
-  const session = await getServerSession(authOptions);
-
-  if (!session)
-    return NextResponse.json(
-      { message: "You don't have permission!" },
-      { status: 401 }
-    );
-  if (
-    session.role != "ADMIN" &&
-    session.role != "OWNER" &&
-    session.role != "MANAGER"
-  )
-    return NextResponse.json(
-      { message: "You are not authorized" },
-      { status: 403 }
+      { message: res.error },
+      { status: res.statusCode }
     );
 
   const { id } = await request.json();
@@ -91,6 +62,65 @@ export async function DELETE(request) {
 
     return NextResponse.json({ message: "Expense Deleted" }, { status: 200 });
   } catch (err) {
+    return NextResponse.json(
+      { message: "Sorry not a lucky day try again" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(request) {
+  const res = await validateRole();
+  if (res?.error)
+    return NextResponse.json(
+      { message: res.error },
+      { status: res.statusCode }
+    );
+
+  const { id, ...request_data } = await request.json();
+  try {
+    await prisma.expense.update({
+      where: {
+        id: id,
+      },
+      data: { ...request_data },
+    });
+
+    return NextResponse.json({ message: "Expense Updated" }, { status: 201 });
+  } catch (err) {
+    console.log(err);
+    return NextResponse.json(
+      { message: "Sorry not a lucky day try again" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request) {
+  const res = await validateRole();
+  if (res?.error)
+    return NextResponse.json(
+      { message: res.error },
+      { status: res.statusCode }
+    );
+  const session = await getServerSession(authOptions);
+  const post_data = await request.json();
+
+  const { amount, expenseType, description, expenseDate, hostelId } = post_data;
+  try {
+    await prisma.expense.create({
+      data: {
+        amount,
+        expenseType,
+        description,
+        expenseDate,
+        hostelId: hostelId || session.user.hostelId,
+      },
+    });
+
+    return NextResponse.json({ message: "Expense Created" }, { status: 201 });
+  } catch (err) {
+    console.log(err);
     return NextResponse.json(
       { message: "Sorry not a lucky day try again" },
       { status: 500 }

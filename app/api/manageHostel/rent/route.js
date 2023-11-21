@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { limiter } from "../../config/limiter";
 
 export async function GET(request) {
+  console.log("in here");
   const origin = request.headers.get("origin");
   const remaining = await limiter.removeTokens(1);
   if (remaining < 0) {

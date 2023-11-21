@@ -20,8 +20,20 @@ export const columns = [
     header: "Tenant",
   },
   {
+    accessorKey: "roomName",
+    header: "Room Name",
+  },
+  {
+    accessorKey: "advance",
+    header: "Advance",
+  },
+  {
+    accessorKey: "contact",
+    header: "Contact",
+  },
+  {
     accessorKey: "amount",
-    header: "Amount",
+    header: "Paid",
   },
   {
     accessorKey: "paymentType",
@@ -55,7 +67,7 @@ export const columns = [
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               onClick={() => {
-                router.push(`/vendorManagment/editVendor?id=${tenant.userId}`);
+                router.push(`/hostels/tenantpay/edit?id=${tenant.id}`);
               }}
             >
               Edit

@@ -8,9 +8,10 @@ export default function SideNav({ className, items, ...props }) {
       className={cn(" flex space-x-0 space-y-1 flex-col", className)}
       {...props}
     >
-      {items?.map((item) =>
+      {items?.map((item, index) =>
         item.isForm ? (
           <FormDialog
+            key={`${item.title}_formdialog_${index}`}
             triggerClass={"justify-start items-start"}
             title={item.title}
             triggerVariant={"ghost"}

@@ -1,13 +1,19 @@
-import Tenantpay from "@components/TenantPay/TenantPay";
+import TenantPay from "@components/TenantPay/TenantPay";
 import { getTenantPay } from "@/app/server_functions/Tenantpay";
 
-const page = async () => {
-  const { isError, data } = await getTenantPay();
+import getQueryClient from "@/app/lib/getQueryClient";
+import Hydrate from "@lib/Hydrate";
+import { TENANT_PAY } from "@lib/Query_Keys";
+import { dehydrate } from "@tanstack/query-core";
 
-  if (isError) {
-    return <p>Sorry Error</p>;
-  }
-  return <Tenantpay data={data} />;
-};
+export default async function TenantPayment() {
+  const queryClient = getQueryClient();
+  await queryClient.prefetchInfiniteQuery([TENANT_PAY], () => getTenantPay());
+  const dehydratedState = dehydrate(queryClient);
 
-export default page;
+  return (
+    <Hydrate state={dehydratedState}>
+      <TenantPay />
+    </Hydrate>
+  );
+}

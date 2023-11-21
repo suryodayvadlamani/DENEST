@@ -10,7 +10,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { expenseModel } from "@/prisma/zod";
 import { Form } from "@UI/form";
 import { createExpenseFn } from "@/app/helpers/expense";
-import { getHostelsFn } from "@/app/helpers/hostel";
 import { DialogClose } from "@radix-ui/react-dialog";
 function AddExpense({ hostelsData }) {
   const expenseSchema = expenseModel.omit({ id: true });
@@ -26,7 +25,8 @@ function AddExpense({ hostelsData }) {
     },
   });
 
-  const { mutate: postExpense, isLoading: mutationLoading } = createExpenseFn();
+  const { mutate: postExpense, isLoading: mutationLoading } =
+    createExpenseFn(cancelRef);
   const onSubmit = async (data) => {
     try {
       postExpense(data);

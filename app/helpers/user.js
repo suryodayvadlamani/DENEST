@@ -1,16 +1,31 @@
 import { request } from "@lib/axios_util";
 import { useToast } from "@UI/use-toast";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { USERS } from "@lib/Query_Keys";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
-export const getUsers = (isTenant) => {
+export const getUsers = ({ isTenant, take = 10, pageParam, isActive }) => {
+  const url = `/api/manageTenant?isActive=${isActive}&&isTenant=${!!isTenant}&&take=${take}${
+    pageParam ? `&&lastCursor=${pageParam}` : ""
+  }`;
   return request({
-    url: `/api/manageTenant?isTenant=${!!isTenant}`,
+    url: url,
   });
 };
-export function getUsersFn() {
-  return useQuery({
-    queryKey: ["users"],
-    queryFn: () => getUsers(),
+export function getUsersFn(isActive) {
+  return useInfiniteQuery({
+    queryKey: [USERS, isActive],
+    queryFn: ({ pageParam }) => {
+      return getUsers({ pageParam, isActive: isActive });
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      return lastPage?.data?.meta?.nextId ?? false;
+    },
   });
 }
 export const getUserById = (id) => {
@@ -21,15 +36,8 @@ export const getUserById = (id) => {
 export function getUserByIdFn(userId) {
   const queryClient = useQueryClient();
   return useQuery({
-    queryKey: ["user", userId],
+    queryKey: [USERS, userId],
     queryFn: () => getUserById(userId),
-    initialData: () => {
-      return {
-        data: queryClient
-          .getQueryData(["users"])
-          ?.data.find((d) => d.id === userId),
-      };
-    },
   });
 }
 export const updateUserById = ({ id, data }) => {
@@ -47,7 +55,7 @@ export function updateUserByIdFn() {
       toast({
         title: "Tenant Updated Successfully",
       });
-      queryClient.invalidateQueries(["users"]);
+      queryClient.invalidateQueries([USERS]);
     },
     onError: () => {
       toast({
@@ -71,7 +79,7 @@ export function createUserFn(cancelRef) {
       toast({
         title: "User Added Successfully",
       });
-      queryClient.invalidateQueries(["users"]);
+      queryClient.invalidateQueries([USERS]);
       cancelRef.current.click();
     },
     onError: () => {
@@ -81,3 +89,30 @@ export function createUserFn(cancelRef) {
     },
   });
 }
+
+export function deleteUserByIdFn() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  return useMutation(deleteUserById, {
+    onSuccess: () => {
+      toast({
+        title: "User Deleted Successfully",
+      });
+      queryClient.invalidateQueries([USERS, "false"]);
+      queryClient.invalidateQueries([USERS, "true"]);
+    },
+    onError: () => {
+      toast({
+        title: "Sorry Something went wrong",
+      });
+    },
+  });
+}
+
+export const deleteUserById = (data) => {
+  return request({
+    url: `/api/manageTenant`,
+    method: "PUT",
+    data,
+  });
+};

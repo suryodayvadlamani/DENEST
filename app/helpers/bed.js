@@ -39,7 +39,7 @@ export function addBedFn() {
   return useMutation(addBed, {
     onSuccess: () => {
       toast({
-        title: "Tenant Room added Successfully",
+        title: "Bed added Successfully",
       });
       queryClient.invalidateQueries(["hostels"]);
     },

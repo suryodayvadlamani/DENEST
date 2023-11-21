@@ -2,35 +2,18 @@ import { getServerSession } from "next-auth";
 import prisma from "../../../prisma/prisma";
 import { NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { limiter } from "../config/limiter";
-import { createRole } from "@/app/api/manageUserRole/route";
+import { createRole, findRole } from "@/app/api/manageUserRole/route";
 import { MANAGER, TENANT } from "@lib/roleId";
-export async function POST(request) {
-  const origin = request.headers.get("origin");
-  const remaining = await limiter.removeTokens(1);
-  if (remaining < 0) {
-    return NextResponse.json(
-      { message: "Too many requests" },
-      { status: 429 },
-      {
-        headers: {
-          "Access-Control-Allow-Origin": origin || "*",
-        },
-      }
-    );
-  }
-  const session = await getServerSession(authOptions);
+import { validateRole } from "@/app/helpers/validateRole";
 
-  if (!session)
+export async function POST(request) {
+  const res = await validateRole();
+  if (res?.error)
     return NextResponse.json(
-      { message: "You don't have persmision!" },
-      { status: 401 }
+      { message: res.error },
+      { status: res.statusCode }
     );
-  if (session.role != "OWNER" && session.role != "ADMIN")
-    return NextResponse.json(
-      { message: "You are not authorized" },
-      { status: 403 }
-    );
+  const session = await getServerSession(authOptions);
 
   const {
     name,
@@ -87,32 +70,13 @@ export async function POST(request) {
 }
 
 export async function PUT(request) {
-  const origin = request.headers.get("origin");
-  const remaining = await limiter.removeTokens(1);
-
-  if (remaining < 0) {
+  const res = await validateRole();
+  if (res?.error)
     return NextResponse.json(
-      { message: "Too many requests" },
-      { status: 429 },
-      {
-        headers: {
-          "Access-Control-Allow-Origin": origin || "*",
-        },
-      }
+      { message: res.error },
+      { status: res.statusCode }
     );
-  }
   const session = await getServerSession(authOptions);
-
-  if (!session)
-    return NextResponse.json(
-      { message: "You don't have permission!" },
-      { status: 401 }
-    );
-  if (session.role != "ADMIN")
-    return NextResponse.json(
-      { message: "You are not authorized" },
-      { status: 403 }
-    );
 
   const { id, ...request_data } = await request.json();
   try {
@@ -123,7 +87,49 @@ export async function PUT(request) {
       data: { ...request_data },
     });
 
-    return NextResponse.json({ message: "Tenant Registered" }, { status: 201 });
+    if (request_data.isActive) {
+      const ur = await findRole(
+        {
+          AND: {
+            userId: { equals: id },
+            isActive: { equals: false },
+          },
+        },
+        {
+          orderBy: {
+            expired: "desc",
+          },
+        }
+      );
+      await prisma.userRoles.update({
+        where: {
+          AND: {
+            id: { equals: ur[0].id },
+            isActive: { equals: true },
+          },
+        },
+        data: {
+          isActive: true,
+          expired: null,
+        },
+      });
+    } else {
+      const ur = await findRole({
+        AND: {
+          userId: { equals: id },
+          isActive: { equals: true },
+        },
+      });
+      await prisma.userRoles.update({
+        where: { id: ur[0].id },
+        data: {
+          isActive: false,
+          expired: new Date(),
+        },
+      });
+    }
+
+    return NextResponse.json({ message: "Tenant deleted" }, { status: 201 });
   } catch (err) {
     console.log(err);
     return NextResponse.json(
@@ -134,56 +140,47 @@ export async function PUT(request) {
 }
 
 export async function GET(request) {
-  const origin = request.headers.get("origin");
-  const remaining = await limiter.removeTokens(1);
-  if (remaining < 0) {
-    return NextResponse.json(
-      { message: "Too many requests" },
-      { status: 429 },
-      {
-        headers: {
-          "Access-Control-Allow-Origin": origin || "*",
-        },
-      }
-    );
-  }
   const session = await getServerSession(authOptions);
-  if (!session)
+
+  const res = await validateRole();
+
+  if (res?.error)
     return NextResponse.json(
-      { message: "You don't have permission!" },
-      { status: 401 }
+      { message: res.error },
+      { status: res.statusCode }
     );
 
-  if (
-    session.role !== "ADMIN" &&
-    session.role !== "OWNER" &&
-    session.role !== "MANAGER"
-  )
-    return NextResponse.json(
-      { message: "You are not authorized" },
-      { status: 403 }
-    );
   try {
     const {
       nextUrl: { search },
     } = request;
     const paramData = new URLSearchParams(search);
+
+    const isActive = paramData.get("isActive") == "true";
     const isTenant = paramData.get("isTenant");
+    const take = parseInt(paramData.get("take")) || 10;
+    const lastCursor = paramData.get("lastCursor") || undefined;
+
     let options = {};
+
     switch (session.role) {
       case "ADMIN":
         options = {
+          ...options,
           include: {
             user: true,
             hostel: true,
             role: true,
           },
+          where: { isActive: isActive },
         };
         break;
       case "OWNER":
         options = {
+          ...options,
           where: {
             AND: [
+              { isActive: isActive },
               { vendorId: session.user.vendorId },
               {
                 OR: [{ roleId: TENANT }, { roleId: MANAGER }],
@@ -199,8 +196,13 @@ export async function GET(request) {
         break;
       case "MANAGER":
         options = {
+          ...options,
           where: {
-            AND: [{ hostelId: session.user.hostelId }, { roleId: TENANT }],
+            AND: [
+              { isActive: isActive },
+              { hostelId: session.user.hostelId },
+              { roleId: TENANT },
+            ],
           },
           include: {
             user: true,
@@ -216,10 +218,32 @@ export async function GET(request) {
       options = {
         ...options,
         where: {
-          AND: [{ ...options.where }, { roleId: TENANT }],
+          AND: [
+            { ...options.where },
+            { isActive: isActive },
+            { roleId: TENANT },
+          ],
         },
       };
     }
+
+    const totalRows = await prisma.userRoles.count({
+      where: options.where,
+    });
+
+    options = {
+      ...options,
+      take: parseInt(take),
+      ...(lastCursor && {
+        skip: 1,
+        cursor: {
+          id: lastCursor,
+        },
+      }),
+      orderBy: {
+        id: "asc",
+      },
+    };
 
     const resp = await prisma.userRoles.findMany(options);
 
@@ -229,18 +253,47 @@ export async function GET(request) {
       },
       select: {
         userId: true,
+        bedId: true,
         rent: true,
       },
     });
+    const bedIds = usersOccupied.map((x) => x.bedId);
+    const RoomData = await prisma.Bed.findMany({
+      where: {
+        id: { in: bedIds },
+      },
+      select: {
+        id: true,
+        room: {
+          select: {
+            title: true,
+          },
+        },
+      },
+    });
+    const flatRoomData = {};
+    RoomData.map((x) => {
+      flatRoomData[x.id] = x.room.title;
+      return x;
+    });
 
     return NextResponse.json(
-      resp.map((ur) => ({
-        ...ur.user,
-        assigned: usersOccupied.map((x) => x.userId).includes(ur.user.id),
-        rent: usersOccupied.filter((x) => x.userId == ur.user.id)[0]?.rent,
-        role: ur.role.name,
-        hostel: ur.hostel.name,
-      })),
+      {
+        data: resp.map((ur) => ({
+          ...ur.user,
+          roomName:
+            flatRoomData[
+              usersOccupied.filter((x) => x.userId == ur.user.id)[0]?.bedId
+            ],
+          assigned: usersOccupied.map((x) => x.userId).includes(ur.user.id),
+          rent: usersOccupied.filter((x) => x.userId == ur.user.id)[0]?.rent,
+          role: ur.role.name,
+          hostel: ur.hostel?.name,
+        })),
+        meta: {
+          nextId: resp.length === take ? resp[take - 1].id : undefined,
+        },
+      },
 
       { status: 200 }
     );

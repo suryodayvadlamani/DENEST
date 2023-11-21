@@ -1,6 +1,11 @@
 import { request } from "@lib/axios_util";
 import { DUES } from "@lib/Query_Keys";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 export const createDues = (data) => {
   return request({
@@ -10,17 +15,26 @@ export const createDues = (data) => {
   });
 };
 
-export const getDues = () => {
+export const getDues = ({ take = 10, pageParam }) => {
+  const url = `/api/manageDues?&&take=${take}${
+    pageParam ? `&&lastCursor=${pageParam}` : ""
+  }`;
   return request({
-    url: `/api/manageDues`,
+    url: url,
   });
 };
-export function getDuesFn() {
-  return useQuery({
+export const getDuesFn = () => {
+  return useInfiniteQuery({
     queryKey: [DUES],
-    queryFn: () => getDues(),
+    queryFn: ({ pageParam }) => {
+      return getDues({ pageParam });
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      return lastPage?.data?.meta?.nextId ?? false;
+    },
   });
-}
+};
 
 export function createDuesFn() {
   const queryClient = useQueryClient();

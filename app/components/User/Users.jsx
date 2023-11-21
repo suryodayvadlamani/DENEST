@@ -1,34 +1,29 @@
 "use client";
-import { Button } from "@UI/button";
-import { Input } from "@UI/input";
-import { BsSearch } from "react-icons/bs";
-import { DataTable } from "@components/DataTable/DataTable";
-import { columns } from "@components/User/Columns";
-import AddTenant from "@components/User/AddTenant";
 
-import FormDialog from "@components/Form/FormDialog";
+import { useSearchParams } from "next/navigation";
 
-function Users({ data }) {
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@UI/tabs";
+import ActiveUsers from "@components/User/ActiveUsers";
+import InActiveUsers from "@components/User/InActiveUsers";
+
+function Users() {
+  const searchParams = useSearchParams();
+
+  const activeTab = searchParams.get("activeTab") || "active";
+
   return (
-    <>
-      <section className="flex flex-row gap-5 items-center">
-        <Button variant="ghost">Total Users {data?.length}</Button>
-
-        <FormDialog title="Add User" triggerTitle="+Add User">
-          <AddTenant />
-        </FormDialog>
-      </section>
-
-      {data?.length > 0 && (
-        <DataTable
-          columns={columns}
-          data={data}
-          pagination={true}
-          sorting={true}
-          className={"mt-4 flex-1"}
-        />
-      )}
-    </>
+    <Tabs defaultValue={activeTab}>
+      <TabsList className="grid w-1/2 grid-cols-2">
+        <TabsTrigger value="active">Active</TabsTrigger>
+        <TabsTrigger value="inactive">Inactive</TabsTrigger>
+      </TabsList>
+      <TabsContent value="active">
+        <ActiveUsers />
+      </TabsContent>
+      <TabsContent value="inactive">
+        <InActiveUsers />
+      </TabsContent>
+    </Tabs>
   );
 }
 

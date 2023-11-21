@@ -20,22 +20,26 @@ import { useEffect, useState } from "react";
 import Room from "@components/Room/Room";
 import AddRoom from "@components/Hostel/AddRoom";
 import FormDialog from "@components/Form/FormDialog";
-function Hostel({ hostelsData }) {
-  const [selectedHostel, setSelectedHostel] = useState(hostelsData[0].id);
+import { getHostelsFn } from "@/app/helpers/hostel";
+
+function Hostel() {
+  const { data: hostelsData } = getHostelsFn();
+
+  const [selectedHostel, setSelectedHostel] = useState(hostelsData.data[0].id);
   const [selectedHostelRooms, setSelectedHostelRooms] = useState([]);
   const [selectedFloor, setSelectedFloor] = useState(1);
 
   useEffect(() => {
     setSelectedHostelRooms(() => {
-      return hostelsData
+      return hostelsData.data
         .filter((x) => x.id == selectedHostel)[0]
         .Rooms?.filter((room) => room.floorId == selectedFloor);
     });
-  }, [hostelsData, selectedFloor, selectedHostel]);
+  }, [hostelsData.data, selectedFloor, selectedHostel]);
   const form = useForm({
     defaultValues: {
-      floorId: 1,
-      hostelId: hostelsData[0].id,
+      floorId: "1",
+      hostelId: hostelsData.data[0].id,
     },
   });
 
@@ -55,6 +59,7 @@ function Hostel({ hostelsData }) {
                   <FormLabel>Hostel</FormLabel>
                   <Select
                     onValueChange={(e) => {
+                      console.log(e);
                       setSelectedHostel(e);
                       field.onChange(e);
                     }}
@@ -66,7 +71,7 @@ function Hostel({ hostelsData }) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {hostelsData?.map((hostel) => {
+                      {hostelsData.data?.map((hostel) => {
                         return (
                           <SelectItem key={hostel.id} value={`${hostel.id}`}>
                             {hostel.name}
@@ -87,7 +92,7 @@ function Hostel({ hostelsData }) {
                   <FormLabel>Floor</FormLabel>
                   <Select
                     onValueChange={(e) => {
-                      setSelectedFloor(e);
+                      setSelectedFloor(parseInt(e));
                       field.onChange;
                     }}
                     defaultValue={field.value}
@@ -100,7 +105,7 @@ function Hostel({ hostelsData }) {
                     <SelectContent>
                       {Array.from(
                         {
-                          length: hostelsData.filter(
+                          length: hostelsData.data.filter(
                             (x) => x.id == selectedHostel
                           )[0]?.floors,
                         },
@@ -109,7 +114,7 @@ function Hostel({ hostelsData }) {
                         return (
                           <SelectItem
                             key={`Floor${index + 1}`}
-                            value={index + 1}
+                            value={`${index + 1}`}
                           >
                             {index + 1}
                           </SelectItem>

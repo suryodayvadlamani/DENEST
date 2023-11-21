@@ -16,12 +16,15 @@ export default async function nextFetch(url, tags, method = "GET", body) {
       },
     };
     if (method == "GET") initOptions.next = { tags: [...tags] };
-    if (method == "POST") initOptions.body = JSON.stringify(body);
+    if (method == "POST" || method == "PUT")
+      initOptions.body = JSON.stringify(body);
+
     const response = await fetch(url, initOptions);
     const data = await response.json();
 
     return data;
   } catch (err) {
+    console.log({ err });
     return { err };
   }
 }

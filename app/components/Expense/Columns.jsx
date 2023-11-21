@@ -17,7 +17,7 @@ const actionColumn = {
     const router = useRouter();
     const expense = row.original;
     const { mutate: deleteExpense, isLoading: mutationLoading } =
-      deleteExpenseFn();
+      deleteExpenseFn(row.original.expenseType);
 
     return (
       <DropdownMenu>
@@ -30,7 +30,7 @@ const actionColumn = {
         <DropdownMenuContent align="end">
           <DropdownMenuItem
             onClick={() => {
-              router.push(`/vendorManagment/editVendor?id=${expense.id}`);
+              router.push(`/hostels/expenses/edit?id=${expense.id}`);
             }}
           >
             Edit
@@ -43,19 +43,19 @@ const actionColumn = {
     );
   },
 };
-export const mobile_columns = [
+
+export const columns = [
   {
     accessorKey: "expenseType",
     header: "Expense Type",
   },
+
   {
-    accessorKey: "amount",
+    accessorKey: "_sum.amount",
     header: "Amount",
   },
-
-  { ...actionColumn },
 ];
-export const large_columns = [
+export const detailed_columns = [
   {
     accessorKey: "expenseType",
     header: "Expense Type",
@@ -65,12 +65,12 @@ export const large_columns = [
     header: "Description",
   },
   {
-    accessorKey: "amount",
-    header: "Amount",
+    accessorKey: "expenseDate",
+    header: "ExpenseDate",
   },
   {
-    accessorKey: "expenseDate",
-    header: "Expense Date",
+    accessorKey: "amount",
+    header: "Amount",
   },
   { ...actionColumn },
 ];

@@ -58,14 +58,12 @@ export const docsConfig = {
 
     userManagment: [
       {
-        href: "/userManagment/assignRole",
         title: "Assign Role",
         icon: FaUserLock,
         isForm: true,
         Form: AssignRole,
       },
       {
-        href: "/userManagment/createUser",
         title: "Create User",
         isForm: true,
         Form: AddTenant,
@@ -79,7 +77,6 @@ export const docsConfig = {
         icon: FaUserLock,
       },
       {
-        href: "/vendorManagment/createVendor",
         title: "Create Vendor",
         icon: FaUserPlus,
         isForm: true,
