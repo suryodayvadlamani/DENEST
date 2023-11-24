@@ -15,6 +15,7 @@ export const createExpense = (data) => {
     data,
   });
 };
+
 export const getExpenseById = (id) => {
   return request({
     url: `/api/manageExpense/${id}`,
@@ -27,29 +28,25 @@ export function getExpenseByIdFn(expenseId) {
     queryFn: () => getExpenseById(expenseId),
   });
 }
-
-export function getExpensesFn(expenseType) {
-  return useQuery({
-    queryKey: [EXPENSES, expenseType],
-    queryFn: () => getExpenses(expenseType),
-  });
-}
-export function getExpensesTypeFn(expenseType) {
-  return useInfiniteQuery({
-    queryKey: [EXPENSES, expenseType],
-    queryFn: () => getExpenses(expenseType),
-    enabled: expenseType != "",
-  });
-}
-
-export const getExpenses = (expenseType) => {
-  const { to, from } = useStore.getState().filter;
-  const startDate = to && new Date(from).toISOString();
-  const endDate = from && new Date(to).toISOString();
+export const getExpenses = (expenseType, date) => {
   return request({
-    url: `/api/manageExpense?expenseType=${expenseType}&&startDate=${startDate}&&endDate=${endDate}`,
+    url: `/api/manageExpense?expenseType=${expenseType}&&startDate=${date.startDate}&&endDate=${date.endDate}`,
   });
 };
+
+export function getExpensesFn(expenseType, date) {
+  return useQuery({
+    queryKey: [EXPENSES, date],
+    queryFn: () => getExpenses(expenseType, date),
+  });
+}
+export function getExpensesTypeFn(expenseType, date) {
+  return useInfiniteQuery({
+    queryKey: [EXPENSES, expenseType],
+    queryFn: () => getExpenses(expenseType, date),
+    enabled: expenseType != "" && expenseType != "All",
+  });
+}
 
 export function createExpenseFn(cancelRef) {
   const { toast } = useToast();

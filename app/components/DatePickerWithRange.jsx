@@ -9,15 +9,26 @@ import { Calendar } from "@UI/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@UI/popover";
 import { useState } from "react";
 
-export default function DatePickerWithRange({ className, callBack }) {
+export default function DatePickerWithRange({
+  className,
+  callBack,
+  defaultDate,
+}) {
+  const [state, setState] = useState(false);
   const [date, setDate] = useState({
-    from: new Date(2022, 0, 20),
-    to: addDays(new Date(2022, 0, 20), 20),
+    from: new Date(defaultDate.startDate),
+    to: new Date(defaultDate.endDate),
   });
-
+  const okClick = () => {
+    callBack({
+      startDate: date.from && new Date(date.from).toISOString(),
+      endDate: date.to && new Date(date.to).toISOString(),
+    });
+    setState(false);
+  };
   return (
     <div className={cn("grid gap-2", className)}>
-      <Popover>
+      <Popover open={state} onOpenChange={setState}>
         <PopoverTrigger asChild>
           <Button
             id="date"
@@ -48,21 +59,13 @@ export default function DatePickerWithRange({ className, callBack }) {
             mode="range"
             defaultMonth={date?.from}
             selected={date}
-            onSelect={(param) => {
-              if (!param) return;
-              const { to, from } = param;
-
-              callBack();
-              useStore.setState({
-                filter: {
-                  to,
-                  from,
-                },
-              });
-              setDate({ to, from });
-            }}
+            onSelect={setDate}
             numberOfMonths={2}
           />
+          <section className="flex flex-row gap-4 items-center justify-around my-2">
+            <Button onClick={okClick}> OK</Button>
+            <Button onClick={() => setState(false)}> Cancel</Button>
+          </section>
         </PopoverContent>
       </Popover>
     </div>

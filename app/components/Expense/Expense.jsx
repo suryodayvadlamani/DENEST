@@ -11,7 +11,17 @@ import DatePickerWithRange from "@components/DatePickerWithRange";
 import { Skeleton } from "@UI/skeleton";
 
 function Expense({ hostelsData }) {
-  const { data, isFetching: mainFetch } = getExpensesFn("All");
+  const today = new Date();
+  const [date, setDate] = useState({
+    startDate: new Date(today.getFullYear(), today.getMonth(), 1).toISOString(),
+    endDate: today.toISOString(),
+  });
+
+  const {
+    data,
+    isFetching: mainFetch,
+    refetch: mainRefetch,
+  } = getExpensesFn("All", date);
 
   const [expType, setExpType] = useState("");
   const rowClicked = (data) => {
@@ -26,13 +36,13 @@ function Expense({ hostelsData }) {
     data: expenseTypeData,
     refetch,
     isFetching,
-  } = getExpensesTypeFn(expType);
+  } = getExpensesTypeFn(expType, date);
   const totalExpenses = useMemo(() => {
     if (!data?.data) return 0;
     return data.data.reduce(getSum, 0);
   }, [data?.data]);
-  const callBack = () => {
-    refetch();
+  const callBack = (date) => {
+    setDate({ ...date });
   };
   const flatData = useMemo(() => {
     if (!expenseTypeData?.pages[0]) return [];
@@ -41,13 +51,13 @@ function Expense({ hostelsData }) {
 
   return (
     <>
-      <div className="flex  flex-row gap-5 ml-10">
+      <div className="flex flex-col md:flex-row gap-5 ml-10">
         <Button variant="ghost">Total Expenses : {totalExpenses}</Button>
 
         <FormDialog title="Add Expense" triggerTitle="Add Expense">
           <AddExpense hostelsData={hostelsData} />
         </FormDialog>
-        <DatePickerWithRange callBack={callBack} />
+        <DatePickerWithRange defaultDate={date} callBack={callBack} />
       </div>
 
       <section className="flex flex-col md:flex-row gap-2">

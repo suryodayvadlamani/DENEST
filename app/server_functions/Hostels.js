@@ -10,7 +10,10 @@ export async function getHostels() {
   const filters = `startDate=${firstDay.toISOString()}`;
 
   try {
-    const response = await nextFetch(`api/manageHostel?${filters}`, [HOSTELS]);
+    const response = await nextFetch(`api/manageHostel?${filters}`, [
+      HOSTELS,
+      "All",
+    ]);
 
     return { error: false, data: response };
   } catch (e) {
