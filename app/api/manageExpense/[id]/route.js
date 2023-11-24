@@ -78,6 +78,7 @@ export async function PUT(request) {
     );
 
   const { id, ...request_data } = await request.json();
+
   try {
     await prisma.expense.update({
       where: {

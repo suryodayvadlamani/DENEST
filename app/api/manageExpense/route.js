@@ -66,7 +66,6 @@ export async function GET(request) {
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
 
-    console.log({ startDate, endDate }, "ghj");
     let whereClause = {};
 
     switch (session.role) {
@@ -84,7 +83,6 @@ export async function GET(request) {
     let timeFilter = {};
     const chck = [null, "undefined"];
     if (!chck.includes(startDate) && !chck.includes(endDate)) {
-      console.log({ startDate, endDate });
       timeFilter = {
         AND: [
           {
@@ -133,7 +131,7 @@ export async function GET(request) {
         },
       });
     }
-    console.log(resp);
+
     return NextResponse.json(resp, { status: 200 });
   } catch (err) {
     console.log(err);

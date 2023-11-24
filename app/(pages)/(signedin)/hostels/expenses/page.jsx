@@ -12,9 +12,13 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 const Expenses = async () => {
   const queryClient = getQueryClient();
   const session = await getServerSession(authOptions);
-  if (session) await queryClient.prefetchQuery([EXPENSES], () => getExpense());
-  const dehydratedState = dehydrate(queryClient);
   const { data: hostelsData } = await getHostels();
+
+  if (session) {
+    await queryClient.prefetchQuery([EXPENSES], () => getExpense());
+  }
+  const dehydratedState = dehydrate(queryClient);
+
   return (
     <Hydrate state={dehydratedState}>
       <Expense hostelsData={hostelsData} />

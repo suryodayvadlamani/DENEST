@@ -4,17 +4,17 @@ import nextFetch from "@/app/lib/nextFetch";
 
 export async function getExpense() {
   try {
+    const today = new Date();
+
     const startDate = new Date(
       today.getFullYear(),
       today.getMonth(),
       1
     ).toISOString();
 
-    const endDate = from && new Date().toISOString();
-
     const response = await nextFetch(
-      `/api/manageExpense?startDate=${startDate}&&endDate=${endDate}`,
-      [EXPENSES, ""]
+      `/api/manageExpense?startDate=${startDate}&&endDate=${today.toISOString()}`,
+      [EXPENSES, "All"]
     );
 
     return { isError: false, data: response };
