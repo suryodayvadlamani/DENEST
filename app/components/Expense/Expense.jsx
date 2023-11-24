@@ -51,7 +51,7 @@ function Expense({ hostelsData }) {
 
   return (
     <>
-      <div className="flex  flex-row gap-5 ml-10">
+      <div className="flex flex-col md:flex-row gap-5 ml-10">
         <Button variant="ghost">Total Expenses : {totalExpenses}</Button>
 
         <FormDialog title="Add Expense" triggerTitle="Add Expense">

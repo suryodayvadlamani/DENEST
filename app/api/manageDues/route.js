@@ -115,8 +115,24 @@ export async function GET(request) {
         user: true,
       },
     });
-
     const userIds = resp.map((ur) => ur.userId);
+    const RoomsDetails = await prisma.tenantRoom.findMany({
+      where: {
+        userId: { in: userIds },
+      },
+      select: {
+        userId: true,
+        bed: {
+          select: {
+            room: {
+              select: {
+                title: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
     let dueData = await prisma.dues.findMany({
       where: {
@@ -132,8 +148,10 @@ export async function GET(request) {
     });
     dueData = dueData.map((x) => {
       const ur = resp.filter((y) => y.userId == x.userId)[0];
+      const roomDetails = RoomsDetails.filter((y) => y.userId == x.userId)[0];
       return {
         amount: x.amount,
+        roomName: roomDetails.bed.room.title,
         userName: ur.user.name,
         hostelName: ur.hostel.name,
       };

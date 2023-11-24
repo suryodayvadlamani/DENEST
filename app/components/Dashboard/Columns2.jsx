@@ -6,6 +6,10 @@ export const columns2 = [
     header: "Hostel",
   },
   {
+    accessorKey: "roomName",
+    header: "Room",
+  },
+  {
     accessorKey: "userName",
     header: "Tenant",
   },
