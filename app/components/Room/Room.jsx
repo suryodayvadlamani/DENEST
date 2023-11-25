@@ -32,14 +32,14 @@ function Room({ roomData }) {
     }
   };
   return (
-    <Card className="w-full h-96">
-      <CardHeader>
-        <CardTitle>{roomData?.title}</CardTitle>
-        <CardDescription>
+    <Card className="h-28">
+      <CardHeader className="p-1">
+        <CardTitle className="text-sm">{roomData?.title}</CardTitle>
+        <CardDescription className="text-xs">
           {roomData?.capacity} {roomData?.roomType}
         </CardDescription>
       </CardHeader>
-      <CardContent className="grid grid-cols-3 items-center h-52 overflow-auto gap-2 justify-between">
+      <CardContent className="flex flex-row items-center h-20 overflow-auto gap-2 ">
         {roomData?.Beds?.map((bed) => {
           return <Bed key={bed.id} bedData={bed} />;
         })}

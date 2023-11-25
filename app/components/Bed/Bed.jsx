@@ -5,7 +5,7 @@ const Bed = ({ bedData }) => {
   return (
     <div key={id} className="flex flex-col items-center text-center">
       {occupied ? (
-        <BiSolidBed className="text-4xl lg:text-6xl text-primary" />
+        <BiSolidBed className="text-xs lg:text-sm text-primary" />
       ) : (
         <BedMenu bedId={id} />
       )}

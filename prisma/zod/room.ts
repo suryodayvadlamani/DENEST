@@ -4,7 +4,7 @@ import { CompleteHostel, relatedHostelModel, CompleteBed, relatedBedModel } from
 
 export const roomModel = z.object({
   id: z.string(),
-  title: z.string(),
+  title: z.string().min(1, { message: "Room Name is must." }),
   capacity: z.number().int(),
   isActive: z.boolean(),
   roomType: z.nativeEnum(Room_Type),

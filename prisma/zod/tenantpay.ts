@@ -5,7 +5,7 @@ import { CompleteUser, relatedUserModel } from "./index"
 export const tenantPayModel = z.object({
   id: z.string(),
   userId: z.string(),
-  amount: z.number().int().nullish(),
+  amount: z.number().int().min(1, { message: "Amount is must." }).nullish(),
   paidDate: z.date(),
   startDate: z.date(),
   endDate: z.date(),

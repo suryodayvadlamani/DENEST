@@ -5,7 +5,7 @@ import { CompleteHostel, relatedHostelModel } from "./index"
 export const expenseModel = z.object({
   id: z.string(),
   expenseType: z.nativeEnum(Expense_Type),
-  amount: z.number().int().nullish(),
+  amount: z.number().int().min(1, { message: "Amount is must." }).nullish(),
   description: z.string().nullish(),
   expenseDate: z.date(),
   hostelId: z.string(),

@@ -11,7 +11,7 @@ export const hostelModel = z.object({
   district: z.string(),
   state: z.string(),
   country: z.string(),
-  contact: z.string(),
+  contact: z.string().min(1, { message: "Contact number is must." }).regex(new RegExp(/^\+?[1-9][0-9]{7,14}$/)),
   vendorId: z.string().nullish(),
   isActive: z.boolean(),
 })
