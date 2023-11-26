@@ -1,39 +1,23 @@
 import { getServerSession } from "next-auth";
-
+import { differenceInMonths, parseISO } from "date-fns";
 import prisma from "../../../prisma/prisma";
 import { NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { limiter } from "../config/limiter";
+import { validateRole } from "@/app/helpers/validateRole";
 
 export async function GET(request) {
-  const origin = request.headers.get("origin");
-  const remaining = await limiter.removeTokens(1);
-  if (remaining < 0) {
-    return NextResponse.json(
-      { message: "Too many requests" },
-      { status: 429 },
-      {
-        headers: {
-          "Access-Control-Allow-Origin": origin || "*",
-        },
-      }
-    );
-  }
   const session = await getServerSession(authOptions);
-  if (!session)
+  const res = await validateRole();
+  if (res?.error)
     return NextResponse.json(
-      { message: "You don't have persmision!" },
-      { status: 401 }
+      { message: res.error },
+      { status: res.statusCode }
     );
-  if (
-    session.role !== "ADMIN" &&
-    session.role !== "OWNER" &&
-    session.role !== "MANAGER"
-  )
-    return NextResponse.json(
-      { message: "You are not authorized" },
-      { status: 403 }
-    );
+  const searchParams = request.nextUrl.searchParams;
+  const startDate = searchParams.get("startDate");
+  const endDate = searchParams.get("endDate");
+  console.log({ startDate, endDate });
   try {
     let whereClause = {};
     switch (session.role) {
@@ -52,40 +36,79 @@ export async function GET(request) {
     const userIds = resp.map((ur) => ur.userId);
     const hostelIds = resp.map((ur) => ur.hostelId).filter((x) => x != null);
 
-    let rentData = await prisma.tenantRoom.findMany({
-      where: {
-        userId: { in: userIds },
+    let filterData = {
+      userId: { in: userIds },
+      startDate: {
+        gte: startDate,
       },
-      select: {
-        userId: true,
-        rent: true,
-      },
+    };
+
+    const rentData = await prisma.tenantRoom.findMany({
+      where: filterData,
     });
 
-    const paidData = await prisma.tenantPay.findMany({
-      where: {
-        userId: { in: userIds },
-      },
-      select: {
-        userId: true,
-        amount: true,
-        paidDate: true,
-      },
+    let totalRent = 0;
+    rentData.map((x) => {
+      if (x.isActive) {
+        totalRent +=
+          differenceInMonths(new Date(endDate), new Date(x.startDate)) * x.rent;
+      } else {
+        totalRent +=
+          differenceInMonths(new Date(x.endDate), new Date(x.startDate)) *
+          x.rent;
+      }
     });
-    const expenseData = await prisma.expense.findMany({
+
+    const dailyTotal = await prisma.income.aggregate({
       where: {
         hostelId: { in: hostelIds },
+        AND: [
+          {
+            createdDate: {
+              gte: startDate,
+            },
+          },
+          {
+            createdDate: {
+              lte: endDate,
+            },
+          },
+        ],
       },
-      select: {
-        hostelId: true,
+      _sum: {
         amount: true,
-        expenseDate: true,
-        expenseType: true,
       },
     });
-
+    totalRent += dailyTotal._sum.amount;
+    const expenseData = await prisma.expense.aggregate({
+      where: {
+        hostelId: { in: hostelIds },
+        AND: [
+          {
+            expenseDate: {
+              gte: startDate,
+            },
+          },
+          {
+            expenseDate: {
+              lte: endDate,
+            },
+          },
+        ],
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+    const inr = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "INR",
+    });
     return NextResponse.json(
-      { rentData, paidData, expenseData },
+      {
+        totalRent: inr.format(totalRent),
+        totalExpense: inr.format(expenseData._sum.amount),
+      },
       { status: 200 }
     );
   } catch (err) {

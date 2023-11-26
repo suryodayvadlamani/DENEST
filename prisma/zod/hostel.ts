@@ -1,5 +1,5 @@
 import * as z from "zod"
-import { CompleteVendor, relatedVendorModel, CompleteUserRoles, relatedUserRolesModel, CompleteExpense, relatedExpenseModel, CompleteRoom, relatedRoomModel } from "./index"
+import { CompleteVendor, relatedVendorModel, CompleteUserRoles, relatedUserRolesModel, CompleteExpense, relatedExpenseModel, CompleteRoom, relatedRoomModel, CompleteIncome, relatedIncomeModel } from "./index"
 
 export const hostelModel = z.object({
   id: z.string(),
@@ -21,6 +21,7 @@ export interface CompleteHostel extends z.infer<typeof hostelModel> {
   UserRoles: CompleteUserRoles[]
   Expense: CompleteExpense[]
   Rooms: CompleteRoom[]
+  Income: CompleteIncome[]
 }
 
 /**
@@ -33,4 +34,5 @@ export const relatedHostelModel: z.ZodSchema<CompleteHostel> = z.lazy(() => host
   UserRoles: relatedUserRolesModel.array(),
   Expense: relatedExpenseModel.array(),
   Rooms: relatedRoomModel.array(),
+  Income: relatedIncomeModel.array(),
 }))

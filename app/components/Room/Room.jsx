@@ -18,11 +18,11 @@ function Room({ roomData }) {
     try {
       const bedName =
         roomData?.Beds.length > 0
-          ? parseInt(roomData?.Beds.slice(-1)[0]?.title.replace("Bed", "")) + 1
+          ? parseInt(roomData?.Beds.slice(-1)[0]?.title.replace("B", "")) + 1
           : 1;
 
       createBed({
-        title: `Bed${bedName}`,
+        title: `B${bedName}`,
         isActive: true,
         occupied: false,
         roomId: roomData.id,
@@ -32,30 +32,22 @@ function Room({ roomData }) {
     }
   };
   return (
-    <Card className="h-28">
-      <CardHeader className="p-1">
-        <CardTitle className="text-sm">{roomData?.title}</CardTitle>
-        <CardDescription className="text-xs">
-          {roomData?.capacity} {roomData?.roomType}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-row items-center h-20 overflow-auto gap-2 ">
-        {roomData?.Beds?.map((bed) => {
-          return <Bed key={bed.id} bedData={bed} />;
-        })}
-      </CardContent>
-      <CardFooter className="flex justify-end">
-        {roomData?.Beds.length < roomData?.capacity && (
-          <Button
-            isLoading={mutationLoading}
-            disabled={mutationLoading}
-            onClick={AddBed}
-          >
-            +Add Bed
-          </Button>
-        )}
-      </CardFooter>
-    </Card>
+    <div className="flex items-center justify-center">
+      <Card className="h-28 w-72 ">
+        <CardHeader className="p-2">
+          <CardTitle className="text-sm">{roomData?.title}</CardTitle>
+          <CardDescription className="text-xs">
+            {roomData?.capacity} {roomData?.roomType}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-row items-center h-20 overflow-auto gap-2 ">
+          {roomData?.Beds?.map((bed) => {
+            return <Bed key={bed.id} bedData={bed} />;
+          })}
+        </CardContent>
+        <CardFooter className="flex justify-end"></CardFooter>
+      </Card>
+    </div>
   );
 }
 

@@ -35,7 +35,7 @@ const BedMenu = ({ bedId }) => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div>
-              <BiBed className="text-xs lg:text-sm cursor-pointer" />
+              <BiBed className="text-2xl lg:text-3xl cursor-pointer" />
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
