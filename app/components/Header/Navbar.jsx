@@ -12,6 +12,7 @@ import { Icons } from "@components/icons";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
 import NavigationLink from "./NavigationLink";
+import Image from "next/image";
 
 export default async function Navbar() {
   const session = await getServerSession(authOptions);
@@ -23,7 +24,7 @@ export default async function Navbar() {
   return (
     <div className="mr-4 hidden md:flex">
       <Link href="/" className="mr-6 flex items-center space-x-2">
-        <Icons.logo className="h-6 w-6" />
+        <Image src="/logo.png" width={24} height={24} />
         <span className="hidden font-bold sm:inline-block">
           {siteConfig.name}
         </span>
