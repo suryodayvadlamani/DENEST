@@ -73,10 +73,11 @@ function Hostel() {
 
   const AddBed = () => {
     try {
+      const roomData = hostelsData.data
+        .filter((x) => x.id == filters?.hostelId)[0]
+        .Rooms?.filter((room) => room.id == selectedRoom)[0];
       const bedName =
-        hostelsData.data
-          .filter((x) => x.id == filters?.hostelId)[0]
-          .Rooms?.filter((room) => room.id == selectedRoom)[0].Beds.length > 0
+        roomData?.Beds.length > 0
           ? parseInt(roomData?.Beds.slice(-1)[0]?.title.replace("B", "")) + 1
           : 1;
 
@@ -114,7 +115,11 @@ function Hostel() {
                   .filter((x) => x.id == filters?.hostelId)[0]
                   .Rooms?.map((room) => {
                     return (
-                      <SelectItem key={room.id} value={`${room.id}`}>
+                      <SelectItem
+                        key={room.id}
+                        value={`${room.id}`}
+                        disabled={room.capacity <= room.Beds.length}
+                      >
                         {room.title}
                       </SelectItem>
                     );
