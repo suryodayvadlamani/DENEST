@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "next-auth/middleware";
-
+import { getToken } from "next-auth/jwt";
 const allowedOrigins =
   process.env.NODE_ENV === "production"
     ? ["https://www.denest.in"]
@@ -23,8 +23,9 @@ export default withAuth(
     if (req.url.includes(`${allowedOrigins[0]}/auth`)) {
       return NextResponse.next();
     }
-    const token = req.nextauth.token;
-    console.log({ token });
+    let token = req.nextauth.token;
+    const jwtToken = await getToken({ req, raw: true });
+    console.log({ token, jwtToken });
     ///await getToken({ req: req });
 
     if (!token) {
