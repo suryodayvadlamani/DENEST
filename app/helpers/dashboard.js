@@ -1,15 +1,20 @@
 import { DASHBOARD } from "@lib/Query_Keys";
-import { useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import { request } from "@lib/axios_util";
-export const getDashboard = () => {
+export const getDashboard = (filters) => {
   return request({
-    url: `/api/manageDashboard`,
+    url: `api/manageDashboard?startDate=${filters.startDate}&&endDate=${filters.endDate}`,
   });
 };
 
-export function getDashboardsFn() {
+export function getDashboardsFn(filters) {
   return useQuery({
-    queryKey: [DASHBOARD],
-    queryFn: () => getDashboard(),
+    queryKey: [DASHBOARD, filters],
+    queryFn: () => getDashboard(filters),
   });
 }

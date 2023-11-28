@@ -3,12 +3,12 @@ import { CompleteAccount, relatedAccountModel, CompleteSession, relatedSessionMo
 
 export const userModel = z.object({
   id: z.string(),
-  name: z.string().nullish(),
+  name: z.string().min(1, { message: "Name is must." }).nullish(),
   password: z.string().nullish(),
   email: z.string().min(1, { message: "Email is must." }).email("This is not a valid email.").nullish(),
   emailVerified: z.date().nullish(),
   image: z.string().nullish(),
-  aadhar: z.string().nullish(),
+  aadhar: z.string().min(1, { message: "Aadhar is must." }).nullish(),
   profession: z.string().nullish(),
   addressLine1: z.string().nullish(),
   addressLine2: z.string().nullish(),
@@ -16,7 +16,7 @@ export const userModel = z.object({
   district: z.string().nullish(),
   state: z.string().nullish(),
   country: z.string().nullish(),
-  contact: z.string().nullish(),
+  contact: z.string().min(1, { message: "Contact number is must." }).regex(new RegExp(/^\+?[1-9][0-9]{7,14}$/)).nullish(),
   createdDate: z.date(),
   isActive: z.boolean(),
 })

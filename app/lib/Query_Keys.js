@@ -6,3 +6,4 @@ export const DASHBOARD = "Dashboard";
 export const DUES = "Dues";
 export const VENDORS = "Vendors";
 export const ROOMS = "Rooms";
+export const INCOME = "Income";

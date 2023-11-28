@@ -1,20 +1,20 @@
-import React from "react";
-import Dashboard from "@components/Dashboard/Dashboard";
-import { getDashboard } from "@/app/server_functions/manageDashboard";
 import Income from "@components/Income/Income";
 import getQueryClient from "@lib/getQueryClient";
 import Hydrate from "@lib/Hydrate";
-import { DASHBOARD } from "@lib/Query_Keys";
+import { INCOME } from "@lib/Query_Keys";
 import { dehydrate } from "@tanstack/query-core";
+import { getDayIncome } from "@/app/server_functions/Income";
 
-export default async function DashboardPage() {
+export default async function DayIncome() {
   const queryClient = getQueryClient();
-  await queryClient.prefetchQuery([DASHBOARD], () => getDashboard());
+  await queryClient.prefetchInfiniteQuery([INCOME, "false"], () =>
+    getDayIncome()
+  );
   const dehydratedState = dehydrate(queryClient);
 
   return (
     <Hydrate state={dehydratedState}>
-      <Dashboard />
+      <Income />
     </Hydrate>
   );
 }

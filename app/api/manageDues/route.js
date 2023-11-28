@@ -151,6 +151,7 @@ export async function GET(request) {
       const roomDetails = RoomsDetails.filter((y) => y.userId == x.userId)[0];
       return {
         amount: x.amount,
+        contact: ur.user.contact,
         roomName: roomDetails.bed.room.title,
         userName: ur.user.name,
         hostelName: ur.hostel.name,

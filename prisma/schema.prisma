@@ -38,12 +38,14 @@ model Session {
 
 model User {
   id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  /// @zod.min(1, { message: "Name is must." })
   name           String?
   password       String?
   /// @zod.min(1, { message: "Email is must." }).email("This is not a valid email.")
   email          String?          @unique
   emailVerified  DateTime?
   image          String?
+  /// @zod.min(1, { message: "Aadhar is must." })
   aadhar         String?
   profession     String?
   addressLine1   String?
@@ -52,6 +54,7 @@ model User {
   district       String?
   state          String?
   country        String?
+  /// @zod.min(1, { message: "Contact number is must." }).regex(new RegExp(/^\+?[1-9][0-9]{7,14}$/))
   contact        String?
   createdDate    DateTime         @default(now())
   isActive       Boolean          @default(true)
@@ -99,6 +102,7 @@ enum Room_Type {
 
 model Room {
   id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  /// @zod.min(1, { message: "Room Name is must." })
   title    String
   capacity Int
   isActive Boolean   @default(true)
@@ -129,6 +133,7 @@ enum Expense_Type {
 model Expense {
   id          String       @id @default(auto()) @map("_id") @db.ObjectId
   expenseType Expense_Type
+  /// @zod.min(1, { message: "Amount is must." })
   amount      Int?
   description String?
   expenseDate DateTime
@@ -136,10 +141,41 @@ model Expense {
   hostel      Hostel       @relation(fields: [hostelId], references: [id], onDelete: Cascade)
 }
 
+model Income {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  /// @zod.min(1, { message: "Name is must." })
+  name          String?
+  password      String?
+  /// @zod.min(1, { message: "Email is must." }).email("This is not a valid email.")
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  /// @zod.min(1, { message: "Aadhar is must." })
+  aadhar        String?
+  profession    String?
+  addressLine1  String?
+  addressLine2  String?
+  pinCode       String?
+  district      String?
+  state         String?
+  country       String?
+  /// @zod.min(1, { message: "Contact number is must." }).regex(new RegExp(/^\+?[1-9][0-9]{7,14}$/))
+  contact       String?
+  createdDate   DateTime  @default(now())
+  /// @zod.min(1, { message: "Amount is must." })
+  amount        Int?
+  days          Int?
+  isActive      Boolean   @default(true)
+
+  hostelId String @db.ObjectId
+  hostel   Hostel @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+}
+
 model TenantPay {
   id          String         @id @default(auto()) @map("_id") @db.ObjectId
   userId      String         @db.ObjectId
   user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// @zod.min(1, { message: "Amount is must." })
   amount      Int?
   paidDate    DateTime       @default(now())
   startDate   DateTime
@@ -172,6 +208,7 @@ model Hostel {
   district     String
   state        String
   country      String
+  /// @zod.min(1, { message: "Contact number is must." }).regex(new RegExp(/^\+?[1-9][0-9]{7,14}$/))
   contact      String
   vendorId     String?     @db.ObjectId
   vendor       Vendor?     @relation(fields: [vendorId], references: [id], onDelete: Cascade)
@@ -179,12 +216,15 @@ model Hostel {
   UserRoles    UserRoles[]
   Expense      Expense[]
   Rooms        Room[]
+  Income       Income[]
 }
 
 model Vendor {
   id           String      @id @default(auto()) @map("_id") @db.ObjectId
   name         String
+  /// @zod.min(1, { message: "Email is must." }).email("This is not a valid email.")
   email        String
+  /// @zod.min(1, { message: "GSTIN is must." })
   GSTIN        String
   addressLine1 String
   addressLine2 String
@@ -192,6 +232,7 @@ model Vendor {
   district     String
   state        String
   country      String
+  /// @zod.min(1, { message: "Contact number is must." }).regex(new RegExp(/^\+?[1-9][0-9]{7,14}$/))
   contact      String
   isActive     Boolean     @default(true)
   UserRoles    UserRoles[]

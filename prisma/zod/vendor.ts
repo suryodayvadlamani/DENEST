@@ -4,15 +4,15 @@ import { CompleteUserRoles, relatedUserRolesModel, CompleteHostel, relatedHostel
 export const vendorModel = z.object({
   id: z.string(),
   name: z.string(),
-  email: z.string(),
-  GSTIN: z.string(),
+  email: z.string().min(1, { message: "Email is must." }).email("This is not a valid email."),
+  GSTIN: z.string().min(1, { message: "GSTIN is must." }),
   addressLine1: z.string(),
   addressLine2: z.string(),
   pincode: z.string(),
   district: z.string(),
   state: z.string(),
   country: z.string(),
-  contact: z.string(),
+  contact: z.string().min(1, { message: "Contact number is must." }).regex(new RegExp(/^\+?[1-9][0-9]{7,14}$/)),
   isActive: z.boolean(),
 })
 

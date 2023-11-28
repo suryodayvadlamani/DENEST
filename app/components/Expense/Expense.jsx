@@ -51,18 +51,20 @@ function Expense({ hostelsData }) {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row gap-5 ml-10">
-        <Button variant="ghost">Total Expenses : {totalExpenses}</Button>
-
-        <FormDialog title="Add Expense" triggerTitle="Add Expense">
-          <AddExpense hostelsData={hostelsData} />
-        </FormDialog>
+      <div className="flex flex-col md:flex-row gap-5 items-center w-full">
         <DatePickerWithRange defaultDate={date} callBack={callBack} />
+        <div className="flex flex-row gap-1">
+          <Button variant="ghost">Total Expenses : {totalExpenses}</Button>
+
+          <FormDialog title="Add Expense" triggerTitle="Add Expense">
+            <AddExpense hostelsData={hostelsData} />
+          </FormDialog>
+        </div>
       </div>
 
       <section className="flex flex-col md:flex-row gap-2">
         {mainFetch ? (
-          <Skeleton className="w-1/3 h-60" />
+          <Skeleton className="w-1/3 h-70" />
         ) : (
           data?.data.length > 0 && (
             <DataTable
@@ -76,7 +78,7 @@ function Expense({ hostelsData }) {
           )
         )}
         {isFetching ? (
-          <Skeleton className="w-2/3 h-32" />
+          <Skeleton className="w-2/3 h-80" />
         ) : (
           flatData.length > 0 && (
             <DataTable

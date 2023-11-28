@@ -4,7 +4,18 @@ import nextFetch from "@lib/nextFetch";
 
 export async function getDashboard() {
   try {
-    const response = await nextFetch("api/manageDashboard", [DASHBOARD]);
+    const today = new Date();
+
+    const startDate = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      1
+    ).toISOString();
+
+    const response = await nextFetch(
+      `api/manageDashboard?startDate=${startDate}&&endDate=${today.toISOString()}`,
+      [DASHBOARD]
+    );
 
     return { isError: false, data: response };
   } catch (e) {

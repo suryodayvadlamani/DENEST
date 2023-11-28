@@ -3,6 +3,8 @@
 import { LuBuilding2, LuIndianRupee } from "react-icons/lu";
 import { AiOutlineUsergroupDelete } from "react-icons/ai";
 import { FaUserLock, FaUserPlus, FaUser } from "react-icons/fa";
+import { LiaMoneyBillWaveAltSolid } from "react-icons/lia";
+
 import AddTenant from "@components/User/AddTenant";
 import AddVendor from "@components/Vendor/AddVendor";
 import AssignRole from "@components/User/AssignRole";
@@ -14,10 +16,10 @@ import AssignRole from "@components/User/AssignRole";
 // export const docsConfig: DocsConfig = {
 export const docsConfig = {
   mainNav: [
-    // {
-    //   href: "/dashboard",
-    //   title: "Dashboard",
-    // },
+    {
+      href: "/dashboard",
+      title: "Dashboard",
+    },
     {
       href: "/hostels",
       title: "Hostel Managment",
@@ -53,6 +55,11 @@ export const docsConfig = {
         href: "/hostels/rooms",
         title: "Rooms",
         icon: LuBuilding2,
+      },
+      {
+        href: "/hostels/income",
+        title: "Income",
+        icon: LiaMoneyBillWaveAltSolid,
       },
     ],
 

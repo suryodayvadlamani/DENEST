@@ -1,157 +1,79 @@
 "use client";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormControl,
-} from "@UI/form";
 import { Card, CardContent, CardHeader } from "@UI/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@UI/select";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import Room from "@components/Room/Room";
 import AddRoom from "@components/Hostel/AddRoom";
 import FormDialog from "@components/Form/FormDialog";
 import { getHostelsFn } from "@/app/helpers/hostel";
+import Filters from "./Filters";
 
 function Hostel() {
   const { data: hostelsData } = getHostelsFn();
 
-  const [selectedHostel, setSelectedHostel] = useState(hostelsData.data[0].id);
+  const [filters, setSelectedFilters] = useState({
+    floorId: "",
+    hostelId: hostelsData.data[0].id,
+    roomType: "",
+    sharing: "",
+    status: "Vacant",
+  });
   const [selectedHostelRooms, setSelectedHostelRooms] = useState([]);
-  const [selectedFloor, setSelectedFloor] = useState(1);
 
   useEffect(() => {
     setSelectedHostelRooms(() => {
-      return hostelsData.data
-        .filter((x) => x.id == selectedHostel)[0]
-        .Rooms?.filter((room) => room.floorId == selectedFloor);
+      let roomsData = hostelsData.data
+        .filter((x) => x.id == filters?.hostelId)[0]
+        .Rooms?.filter((room) => {
+          let returnData = true;
+          if (filters?.floorId) {
+            returnData = room.floorId == filters?.floorId;
+          }
+          if (filters?.sharing) {
+            returnData = returnData && room.capacity == filters?.sharing;
+          }
+          if (filters?.roomType) {
+            returnData = returnData && room.roomType == filters?.roomType;
+          }
+          return returnData;
+        });
+      if (filters?.status) {
+        roomsData = roomsData
+          .map((room) => {
+            return {
+              ...room,
+              Beds: room.Beds.filter(
+                (bed) => bed.occupied == (filters.status == "Occupied")
+              ),
+            };
+          })
+          .filter((x) => x.Beds.length > 0);
+      }
+
+      console.log(roomsData);
+      return roomsData;
     });
-  }, [hostelsData.data, selectedFloor, selectedHostel]);
-  const form = useForm({
-    defaultValues: {
-      floorId: "1",
-      hostelId: hostelsData.data[0].id,
-    },
-  });
+  }, [
+    filters.hostelId,
+    filters.floorId,
+    filters.sharing,
+    filters?.roomType,
+    filters?.status,
+  ]);
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-row items-center">
-        <Form {...form}>
-          <form className="flex gap-5 p-2 flex-row flex-1">
-            <FormField
-              control={form.control}
-              name="hostelId"
-              render={({ field }) => (
-                <FormItem
-                  id="formItemHostel"
-                  className="w-fit min-w-[192px] pt-2"
-                >
-                  <FormLabel>Hostel</FormLabel>
-                  <Select
-                    onValueChange={(e) => {
-                      console.log(e);
-                      setSelectedHostel(e);
-                      field.onChange(e);
-                    }}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {hostelsData.data?.map((hostel) => {
-                        return (
-                          <SelectItem key={hostel.id} value={`${hostel.id}`}>
-                            {hostel.name}
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="floorId"
-              render={({ field }) => (
-                <FormItem id="formItemFloor" className="w-28  pt-2">
-                  <FormLabel>Floor</FormLabel>
-                  <Select
-                    onValueChange={(e) => {
-                      setSelectedFloor(parseInt(e));
-                      field.onChange;
-                    }}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {Array.from(
-                        {
-                          length: hostelsData.data.filter(
-                            (x) => x.id == selectedHostel
-                          )[0]?.floors,
-                        },
-                        () => 1
-                      ).map((hostel, index) => {
-                        return (
-                          <SelectItem
-                            key={`Floor${index + 1}`}
-                            value={`${index + 1}`}
-                          >
-                            {index + 1}
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </form>
-        </Form>
-      </div>
-      <div className="grid lg:grid-cols-2  items-center gap-3 mt-3">
+      <section className="flex flex-row-reverse w-full ">
+        <Filters
+          hostelsData={hostelsData}
+          setSelectedFilters={setSelectedFilters}
+        />
+      </section>
+      <div className="flex flex-row items-center justify-center gap-3 mt-3 w-full flex-wrap ">
         {selectedHostelRooms &&
           selectedHostelRooms.map((roomData) => (
             <Room key={roomData.id} roomData={roomData} />
           ))}
-        {selectedFloor && (
-          <Card className="w-full h-96 items-center justify-center flex cursor-pointer bg-primary">
-            <CardHeader className="w-full h-full">
-              <CardContent className="w-full h-full">
-                <FormDialog
-                  triggerClass=" items-center text-3xl w-full  h-full justify-center text-primary-foreground"
-                  title="Add Room"
-                  triggerTitle="+Add Room"
-                >
-                  <AddRoom
-                    selectedHostel={selectedHostel}
-                    selectedFloor={selectedFloor}
-                  />
-                </FormDialog>
-              </CardContent>
-            </CardHeader>
-          </Card>
-        )}
       </div>
     </div>
   );

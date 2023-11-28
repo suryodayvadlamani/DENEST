@@ -2,17 +2,22 @@
 
 export const columns2 = [
   {
-    accessorKey: "hostelName",
-    header: "Hostel",
+    accessorKey: "userName",
+    header: "Tenant",
   },
   {
     accessorKey: "roomName",
     header: "Room",
   },
   {
-    accessorKey: "userName",
-    header: "Tenant",
+    accessorKey: "contact",
+    header: "Contact",
   },
+  {
+    accessorKey: "hostelName",
+    header: "Hostel",
+  },
+
   {
     accessorKey: "amount",
     header: "Amount",
