@@ -14,10 +14,15 @@ import { ScrollArea } from "@UI/scroll-area";
 import { useRouter } from "next/navigation";
 import { cn } from "@lib/utils";
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
+import SideNav from "./SideNav";
+
 export default function MobileNavbar() {
   const [open, setOpen] = useState(false);
   const { data: session } = useSession();
   const [navData, setNavData] = useState([]);
+  const pathname = usePathname();
+
   useEffect(() => {
     const docsData =
       session?.role !== "ADMIN"
@@ -67,25 +72,10 @@ export default function MobileNavbar() {
             )}
 
             {/* Sidebar nav start*/}
-
-            {docsConfig.sidebarNav.hostels?.map(
-              (item) =>
-                item.href && (
-                  <MobileLink
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      buttonVariants({ variant: "ghost" }),
-                      "hover:bg-transparent hover:underline",
-                      "justify-start flex flex-row gap-2"
-                    )}
-                    onOpenChange={setOpen}
-                  >
-                    {<item.icon />}
-                    {item.title}
-                  </MobileLink>
-                )
-            )}
+            <SideNav
+              className=""
+              items={docsConfig.sidebarNav[pathname.split("/")[1]]}
+            />
           </div>
         </ScrollArea>
       </SheetContent>

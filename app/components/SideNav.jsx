@@ -35,7 +35,7 @@ export default function SideNav({ className, items, ...props }) {
             )}
           >
             {<item.icon />}
-            <span className="hidden md:flex">{item.title}</span>
+            <span className="flex">{item.title}</span>
           </Link>
         )
       )}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   FormField,
   FormItem,
@@ -6,10 +6,11 @@ import {
   FormMessage,
   FormControl,
 } from "@UI/form";
-
+import { RxEyeClosed, RxEyeOpen } from "react-icons/rx";
 import { Input } from "@UI/input";
 
 function FormInput({ name, form, id, type = "text", label, ...props }) {
+  const [showPassword, showPasswordToggle] = useState(false);
   return (
     <FormField
       control={form.control}
@@ -17,21 +18,38 @@ function FormInput({ name, form, id, type = "text", label, ...props }) {
       render={({ field }) => (
         <FormItem id={`formItem${name}`} className="relative pt-2">
           <FormControl>
-            <Input
-              {...field}
-              onChange={(e) => {
-                field.onChange(
-                  type == "number" && e.target.value
-                    ? e.target.valueAsNumber
-                    : e.target.value
-                );
-              }}
-              id={id}
-              type={type}
-              placeholder=" "
-              {...props}
-              className="peer placeholder-transparent mt-1  w-full rounded-md py-1.5 sm:text-sm sm:leading-6"
-            />
+            <>
+              <Input
+                {...field}
+                onChange={(e) => {
+                  field.onChange(
+                    type == "number" && e.target.value
+                      ? e.target.valueAsNumber
+                      : e.target.value
+                  );
+                }}
+                id={id}
+                type={showPassword ? "text" : type}
+                placeholder=" "
+                {...props}
+                className="peer placeholder-transparent mt-1  w-full rounded-md py-1.5 sm:text-sm sm:leading-6"
+              />
+              {type == "password" && (
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 cursor-pointer">
+                  {showPassword ? (
+                    <RxEyeOpen
+                      className="h-6 w-6"
+                      onClick={() => showPasswordToggle(false)}
+                    />
+                  ) : (
+                    <RxEyeClosed
+                      className="h-6 w-6"
+                      onClick={() => showPasswordToggle(true)}
+                    />
+                  )}
+                </div>
+              )}
+            </>
           </FormControl>
           <FormLabel
             htmlFor={id}

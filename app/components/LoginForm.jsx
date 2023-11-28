@@ -67,7 +67,7 @@ const LoginForm = () => {
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="max-w-2xl shadow-lg p-5 rounded-lg border-t-4 border-primary">
-        <Image src="/logo.png" width={48} height={48} />
+        <Image src="/logo.png" alt="Denest" width={48} height={48} />
 
         <h1 className="text-xl font-bold my-4">Login Here</h1>
         <Form {...form}>
@@ -93,7 +93,6 @@ const LoginForm = () => {
             />
             <Button
               className="font-bold cursor-pointer px-6 py-2"
-              variant="secondary"
               type="submit"
               isLoading={isSubmitting}
               disabled={isSubmitting}
@@ -113,7 +112,7 @@ const LoginForm = () => {
           </div>
         </Form>
 
-        {/* <div className="flex flex-row gap-4 mt-5 justify-around">
+        <div className="flex flex-row gap-4 mt-5 justify-around">
           {providers.map(({ name, Icon }) => (
             <Button
               key={name}
@@ -123,8 +122,8 @@ const LoginForm = () => {
               <Icon />
               {name}
             </Button>
-          ))} 
-        </div>*/}
+          ))}
+        </div>
       </div>
     </div>
   );
