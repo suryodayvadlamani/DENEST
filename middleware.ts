@@ -25,7 +25,7 @@ export default withAuth(
     }
     let token = req.nextauth.token;
     const jwtToken = await getToken({ req, raw: true });
-    console.log({ token, jwtToken });
+    console.log({ token });
     ///await getToken({ req: req });
 
     if (!token) {

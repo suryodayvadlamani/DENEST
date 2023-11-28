@@ -8,29 +8,8 @@ import {
   CardTitle,
 } from "@UI/card";
 import Bed from "@components/Bed/Bed";
-import { Button } from "@UI/button";
-import { addBedFn } from "@/app/helpers/bed";
 
 function Room({ roomData }) {
-  const { mutate: createBed, isLoading: mutationLoading } = addBedFn();
-
-  const AddBed = () => {
-    try {
-      const bedName =
-        roomData?.Beds.length > 0
-          ? parseInt(roomData?.Beds.slice(-1)[0]?.title.replace("B", "")) + 1
-          : 1;
-
-      createBed({
-        title: `B${bedName}`,
-        isActive: true,
-        occupied: false,
-        roomId: roomData.id,
-      });
-    } catch (error) {
-      console.log("Error during Bed Addition: ", error);
-    }
-  };
   return (
     <div className="flex items-center justify-center">
       <Card className="h-28 w-72 ">
