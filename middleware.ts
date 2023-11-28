@@ -19,12 +19,12 @@ export default withAuth(
       response.headers.set("Content-Type", "text/plain");
       return response;
     }
-    console.log(req.url);
+    console.log({ url: req.url });
     if (req.url.includes(`${allowedOrigins[0]}/auth`)) {
       return NextResponse.next();
     }
     const token = req.nextauth.token;
-
+    console.log({ token });
     ///await getToken({ req: req });
 
     if (!token) {
