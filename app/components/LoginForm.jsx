@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { Form } from "@UI/form";
 import FormInput from "@components/Form/FormInput";
 import { useSearchParams, useRouter } from "next/navigation";
+import Image from "next/image";
 
 const LoginForm = () => {
   const [error, setError] = useState("");
@@ -66,6 +67,8 @@ const LoginForm = () => {
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="max-w-2xl shadow-lg p-5 rounded-lg border-t-4 border-primary">
+        <Image src="/logo.png" width={48} height={48} />
+
         <h1 className="text-xl font-bold my-4">Login</h1>
         <Form {...form}>
           <form

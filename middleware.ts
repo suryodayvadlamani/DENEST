@@ -19,7 +19,7 @@ export default withAuth(
       response.headers.set("Content-Type", "text/plain");
       return response;
     }
-
+    console.log(req.url);
     if (req.url.includes(`${allowedOrigins[0]}/auth`)) {
       return NextResponse.next();
     }
@@ -33,7 +33,7 @@ export default withAuth(
       url.searchParams.set(
         "callbackUrl",
         encodeURI(
-          req.url == `${allowedOrigins[0]}/` ? `${req.url}hostel` : req.url
+          req.url == `${allowedOrigins[0]}/` ? `${req.url}hostels` : req.url
         )
       );
       return NextResponse.redirect(url);

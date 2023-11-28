@@ -94,12 +94,14 @@ const page = () => {
   });
 
   const onSubmit = async (data) => {
+    const selectedRole = selectedRoles.filter((r) => r.name === data.role)[0];
     const body_data = {
       userEmail: data.email,
-      roleId: selectedRoles.filter((r) => r.name === data.role)[0].id,
+      roleId: selectedRole.id,
       vendorId: data.vendorId,
       hostelId: "",
       isActive: true,
+      roleName: selectedRole.name,
     };
 
     try {
@@ -107,6 +109,7 @@ const page = () => {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
       });
+      alert("Done");
     } catch (error) {
       console.log("Error during registration: ", error);
     }
