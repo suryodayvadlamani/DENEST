@@ -24,7 +24,7 @@ export default async function Navbar() {
   return (
     <div className="mr-4 hidden md:flex">
       <Link href="/" className="mr-6 flex items-center space-x-2">
-        <Image src="/logo.png" width={24} height={24} />
+        <Image alt="Denest" src="/logo.png" width={24} height={24} />
         <span className="hidden font-bold sm:inline-block">
           {siteConfig.name}
         </span>

@@ -7,7 +7,7 @@ export const metadata = {
 };
 
 export default async function UserLayout({ children }) {
-  const items = docsConfig.sidebarNav["userManagment"];
+  const items = docsConfig.sidebarNav["User Managment"];
 
   return (
     <div className="container relative max-sm:px-4">

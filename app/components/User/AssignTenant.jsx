@@ -1,37 +1,28 @@
 "use client";
-import React from "react";
+
+import React, { useState } from "react";
 import { Button } from "@UI/button";
+import { Input } from "@UI/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { tenantRoomModel } from "../../../prisma/zod";
 import { z } from "zod";
 import FormInput from "@components/Form/FormInput";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormControl,
-} from "@UI/form";
+import { Form } from "@UI/form";
 import { useToast } from "@UI/use-toast";
-import { useRouter } from "next/navigation";
-import { getUsersFn } from "@/app/helpers/user";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@UI/select";
 import { updateTenantRoomFn } from "@/app/helpers/tenantRoom";
-import { useSession } from "next-auth/react";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { useRef } from "react";
+import { Separator } from "@UI/separator";
+import { getUserById } from "@/app/helpers/user";
+import { Label } from "@UI/label";
 const AssignTenant = ({ bedId }) => {
   const userSchema = tenantRoomModel.omit({ id: true }).extend({
-    tenantContact: z.string(),
+    tenantContact: z
+      .string({ message: "Must be 10 digit number" })
+      .min(10, { message: "Must be 10 digit number" }),
   });
+  const [userName, setUserName] = useState("");
   const cancelRef = useRef(null);
   const { toast } = useToast();
   const form = useForm({
@@ -47,9 +38,13 @@ const AssignTenant = ({ bedId }) => {
       endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 10)),
     },
   });
-
-  const { mutate: updateTenantRom, isLoading: mutationLoading } =
-    updateTenantRoomFn(cancelRef);
+  const { getFieldState, trigger, formState, setError, clearErrors } = form;
+  const { errors } = formState;
+  const {
+    mutate: updateTenantRom,
+    isLoading: mutationLoading,
+    error,
+  } = updateTenantRoomFn(cancelRef);
 
   const onSubmit = async (data) => {
     try {
@@ -63,7 +58,28 @@ const AssignTenant = ({ bedId }) => {
       console.log("Error during registration: ", error);
     }
   };
+  const searchCallback = async (value) => {
+    try {
+      await trigger("tenantContact");
+      const { error } = getFieldState("tenantContact");
+      if (!error?.message) {
+        const data = await getUserById(value);
+        if (data.status == 200) {
+          clearErrors("tenantContact");
 
+          setUserName(data?.data.name);
+        } else {
+          setError("tenantContact", {
+            type: "manual",
+            message:
+              "Please check your contact number otherwise create a new tenant",
+          });
+        }
+      }
+    } catch (e) {
+      console.log("inside this");
+    }
+  };
   return (
     <div className="sm:mx-auto sm:w-full sm:max-w-sm px-6 py-6">
       <Form {...form}>
@@ -76,8 +92,15 @@ const AssignTenant = ({ bedId }) => {
             type="tel"
             label="Tenant contact"
             maxLength="10"
+            isSearchable={true}
+            searchCallback={searchCallback}
           />
-
+          {userName && (
+            <>
+              <Label className="ml-4 text-primary">{userName}</Label>
+              <Separator className="my-4" />
+            </>
+          )}
           <FormInput
             className="mb-3"
             name="rent"
@@ -116,6 +139,9 @@ const AssignTenant = ({ bedId }) => {
           </div>
         </form>
       </Form>
+      {error && (
+        <Label className="text-primary">Check the contact Number</Label>
+      )}
     </div>
   );
 };

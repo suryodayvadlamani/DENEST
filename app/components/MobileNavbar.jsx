@@ -51,31 +51,32 @@ export default function MobileNavbar() {
           <Icons.logo className="mr-2 h-4 w-4" />
           <span className="font-bold">{siteConfig.name}</span>
         </MobileLink>
-        <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
+        <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 ">
           <div className="flex flex-col space-y-3">
             {navData?.map(
               (item) =>
                 item.href && (
-                  <MobileLink
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      buttonVariants({ variant: "ghost" }),
-                      "hover:bg-transparent hover:underline",
-                      "justify-start flex flex-row gap-2"
-                    )}
-                    onOpenChange={setOpen}
-                  >
-                    {item.title}
-                  </MobileLink>
+                  <section key={item.href}>
+                    <MobileLink
+                      href={item.href}
+                      className={cn(
+                        buttonVariants({ variant: "ghost" }),
+                        "hover:bg-transparent hover:underline",
+                        "justify-start flex flex-row gap-2"
+                      )}
+                      onOpenChange={setOpen}
+                    >
+                      {item.title}
+                    </MobileLink>
+                    <SideNav
+                      className="ml-4"
+                      items={docsConfig.sidebarNav[item.title]}
+                    />
+                  </section>
                 )
             )}
 
             {/* Sidebar nav start*/}
-            <SideNav
-              className=""
-              items={docsConfig.sidebarNav[pathname.split("/")[1]]}
-            />
           </div>
         </ScrollArea>
       </SheetContent>

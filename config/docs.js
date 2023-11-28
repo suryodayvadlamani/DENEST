@@ -34,7 +34,7 @@ export const docsConfig = {
     },
   ],
   sidebarNav: {
-    hostels: [
+    "Hostel Managment": [
       {
         href: "/hostels/expenses",
         title: "Expenses",
@@ -63,7 +63,7 @@ export const docsConfig = {
       },
     ],
 
-    userManagment: [
+    "User Managment": [
       {
         title: "Assign Role",
         icon: FaUserLock,
@@ -77,7 +77,7 @@ export const docsConfig = {
         icon: FaUserPlus,
       },
     ],
-    vendorManagment: [
+    "Vendor Managment": [
       {
         href: "/vendorManagment/assignRole",
         title: "Assign Role",

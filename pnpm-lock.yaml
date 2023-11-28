@@ -50,6 +50,9 @@ dependencies:
   '@radix-ui/react-select':
     specifier: ^1.2.2
     version: 1.2.2(@types/react@18.2.21)(react-dom@18.3.0-canary-6c7b41da3-20231123)(react@18.3.0-canary-6c7b41da3-20231123)
+  '@radix-ui/react-separator':
+    specifier: ^1.0.3
+    version: 1.0.3(@types/react@18.2.21)(react-dom@18.3.0-canary-6c7b41da3-20231123)(react@18.3.0-canary-6c7b41da3-20231123)
   '@radix-ui/react-slot':
     specifier: ^1.0.2
     version: 1.0.2(@types/react@18.2.21)(react@18.3.0-canary-6c7b41da3-20231123)
@@ -1160,6 +1163,26 @@ packages:
       react: 18.3.0-canary-6c7b41da3-20231123
       react-dom: 18.3.0-canary-6c7b41da3-20231123(react@18.3.0-canary-6c7b41da3-20231123)
       react-remove-scroll: 2.5.5(@types/react@18.2.21)(react@18.3.0-canary-6c7b41da3-20231123)
+    dev: false
+
+  /@radix-ui/react-separator@1.0.3(@types/react@18.2.21)(react-dom@18.3.0-canary-6c7b41da3-20231123)(react@18.3.0-canary-6c7b41da3-20231123):
+    resolution: {integrity: sha512-itYmTy/kokS21aiV5+Z56MZB54KrhPgn6eHDKkFeOLR34HMN2s8PaN47qZZAGnvupcjxHaFZnW4pQEh0BvvVuw==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.23.2
+      '@radix-ui/react-primitive': 1.0.3(@types/react@18.2.21)(react-dom@18.3.0-canary-6c7b41da3-20231123)(react@18.3.0-canary-6c7b41da3-20231123)
+      '@types/react': 18.2.21
+      react: 18.3.0-canary-6c7b41da3-20231123
+      react-dom: 18.3.0-canary-6c7b41da3-20231123(react@18.3.0-canary-6c7b41da3-20231123)
     dev: false
 
   /@radix-ui/react-slot@1.0.2(@types/react@18.2.21)(react@18.3.0-canary-6c7b41da3-20231123):

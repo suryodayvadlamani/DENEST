@@ -112,9 +112,18 @@ export async function GET(request, { params }) {
     const {
       nextUrl: { search },
     } = request;
-    const { isActive } = new URLSearchParams(search);
+
+    const paramData = new URLSearchParams(search);
+
+    const isActive = paramData.get("isActive") == "true";
     const { id } = params;
-    const whereClause = isActive ? { id, isActive: true } : { id };
+    let whereClause = {};
+
+    if (id.length == 10)
+      whereClause = isActive
+        ? { contact: id, isActive: true }
+        : { contact: id };
+    else whereClause = isActive ? { id, isActive: true } : { id };
 
     const resp = await prisma.user.findMany({
       orderBy: [
@@ -124,6 +133,11 @@ export async function GET(request, { params }) {
       ],
       where: whereClause,
     });
+    if (resp.length < 1)
+      return NextResponse.json(
+        { message: "Sorry not a lucky day try again" },
+        { status: 500 }
+      );
 
     return NextResponse.json(resp[0], { status: 200 });
   } catch (err) {

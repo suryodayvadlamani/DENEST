@@ -7,6 +7,8 @@ import { addBedFn } from "@/app/helpers/bed";
 import { Button } from "@UI/button";
 import { Input } from "@UI/input";
 import { Label } from "@UI/label";
+import { BiSolidBed } from "react-icons/bi";
+import { BiBed } from "react-icons/bi";
 import {
   Select,
   SelectContent,
@@ -24,7 +26,7 @@ function Hostel() {
     hostelId: hostelsData.data[0].id,
     roomType: "",
     sharing: "",
-    status: "Vacant",
+    status: "",
   });
   const [selectedHostelRooms, setSelectedHostelRooms] = useState([]);
 
@@ -58,7 +60,6 @@ function Hostel() {
           .filter((x) => x.Beds.length > 0);
       }
 
-      console.log(roomsData);
       return roomsData;
     });
   }, [
@@ -95,7 +96,17 @@ function Hostel() {
 
   return (
     <div className="flex flex-col">
-      <section className="flex flex-row-reverse w-full items-center gap-4">
+      <section className="flex flex-row w-full items-center gap-4 flex-wrap">
+        <BiBed id="Vacant" className="text-xl lg:text-xl " />
+        <Label htmlFor="Vacant">Vacant</Label>
+        <BiSolidBed
+          id="Occupied"
+          className="text-xl lg:text-2xl text-primary"
+        />
+        <Label htmlFor="Occupied" className="text-primary">
+          Occupied
+        </Label>
+
         <Filters
           hostelsData={hostelsData}
           setSelectedFilters={setSelectedFilters}
@@ -104,7 +115,7 @@ function Hostel() {
           <PopoverTrigger asChild>
             <Button>+Add Bed</Button>
           </PopoverTrigger>
-          <PopoverContent className="w-40">
+          <PopoverContent className="w-60">
             <Select onValueChange={setSelectedRoom}>
               <SelectTrigger>
                 <SelectValue placeholder="Select Room" />

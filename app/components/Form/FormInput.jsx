@@ -6,10 +6,19 @@ import {
   FormMessage,
   FormControl,
 } from "@UI/form";
-import { RxEyeClosed, RxEyeOpen } from "react-icons/rx";
+import { RxEyeClosed, RxEyeOpen, RxMagnifyingGlass } from "react-icons/rx";
 import { Input } from "@UI/input";
 
-function FormInput({ name, form, id, type = "text", label, ...props }) {
+function FormInput({
+  name,
+  form,
+  id,
+  type = "text",
+  isSearchable,
+  searchCallback,
+  label,
+  ...props
+}) {
   const [showPassword, showPasswordToggle] = useState(false);
   return (
     <FormField
@@ -34,6 +43,16 @@ function FormInput({ name, form, id, type = "text", label, ...props }) {
                 {...props}
                 className="peer placeholder-transparent mt-1  w-full rounded-md py-1.5 sm:text-sm sm:leading-6"
               />
+              {isSearchable && (
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 cursor-pointer">
+                  <RxMagnifyingGlass
+                    className="h-6 w-6"
+                    onClick={() => {
+                      searchCallback(field.value);
+                    }}
+                  />
+                </div>
+              )}
               {type == "password" && (
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 cursor-pointer">
                   {showPassword ? (

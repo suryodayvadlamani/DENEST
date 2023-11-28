@@ -7,7 +7,7 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  const items = docsConfig.sidebarNav["hostels"];
+  const items = docsConfig.sidebarNav["Hostel Managment"];
   return (
     <>
       <div className="container relative max-sm:px-4">

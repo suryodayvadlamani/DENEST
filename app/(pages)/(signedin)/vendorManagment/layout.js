@@ -7,7 +7,7 @@ export const metadata = {
 };
 import { FaUserLock, FaUserPlus } from "react-icons/fa";
 export default function RootLayout({ children }) {
-  const items = docsConfig.sidebarNav["vendorManagment"];
+  const items = docsConfig.sidebarNav["Vendor Managment"];
   return (
     <>
       <div className="container relative max-sm:px-4">

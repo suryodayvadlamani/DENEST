@@ -82,7 +82,9 @@ const Filters = ({ setSelectedFilters, hostelsData }) => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <LuFilter className="cursor-pointer text-2xl" />
+        <Button variant="ghost" className="cursor-pointer text-2xl">
+          <LuFilter />
+        </Button>
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
