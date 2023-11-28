@@ -112,7 +112,7 @@ const LoginForm = () => {
           </div>
         </Form>
 
-        <div className="flex flex-row gap-4 mt-5 justify-around">
+        {/* <div className="flex flex-row gap-4 mt-5 justify-around">
           {providers.map(({ name, Icon }) => (
             <Button
               key={name}
@@ -123,7 +123,7 @@ const LoginForm = () => {
               {name}
             </Button>
           ))}
-        </div>
+        </div> */}
       </div>
     </div>
   );

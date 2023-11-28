@@ -11,7 +11,7 @@ const Header = () => {
         <MobileNavbar />
         <div className="flex flex-1 items-center justify-end  space-x-2 ">
           <nav className="flex items-center">
-            <Filter />
+            {/* <Filter /> */}
             <ThemeToggler />
             <ProfileButton />
           </nav>
