@@ -72,14 +72,14 @@ export const authOptions = {
               role: true,
             },
           });
-
+          console.log(userRole?.roleId);
           return {
             ...token,
-            roleId: userRole.roleId,
+            roleId: userRole?.roleId,
             userId: user.id,
-            hostelId: userRole.hostelId,
-            vendorId: userRole.vendorId,
-            role: userRole.role.name,
+            hostelId: userRole?.hostelId,
+            vendorId: userRole?.vendorId,
+            role: userRole?.role?.name,
           };
         } catch (err) {
           console.log(err);

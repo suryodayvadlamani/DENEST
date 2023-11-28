@@ -6,8 +6,6 @@ const allowedOrigins =
     ? ["https://www.denest.in"]
     : ["http://localhost:3000"];
 
-export async function middleware(req: NextRequest) {}
-
 export default withAuth(
   // `withAuth` augments your `Request` with the user's token.
   async function middleware(req) {
@@ -25,21 +23,22 @@ export default withAuth(
     if (req.url.includes(`${allowedOrigins[0]}/auth`)) {
       return NextResponse.next();
     }
-    console.log(req.url, allowedOrigins);
     const token = req.nextauth.token;
+
     ///await getToken({ req: req });
-    console.log(token);
+
     if (!token) {
       const url = new URL(`/auth/login`, req.url);
 
       url.searchParams.set(
         "callbackUrl",
         encodeURI(
-          req.url == `${allowedOrigins[0]}/` ? `${req.url}dashboard` : req.url
+          req.url == `${allowedOrigins[0]}/` ? `${req.url}hostel` : req.url
         )
       );
       return NextResponse.redirect(url);
     }
+
     if (
       token.role !== "ADMIN" &&
       token.role !== "OWNER" &&
@@ -60,8 +59,7 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ token }) => {
-        if (token) return true;
-        else return false;
+        return true;
       },
     },
   }
