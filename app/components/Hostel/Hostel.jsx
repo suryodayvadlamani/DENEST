@@ -29,7 +29,7 @@ function Hostel() {
   });
   const { data: hostelsData } = getHostelsFn(filters);
   const { mutate: createBed, isLoading: mutationLoading } = addBedFn();
-  console.log(hostelsData?.data);
+
   const AddBed = () => {
     try {
       const roomData = hostelsData.data

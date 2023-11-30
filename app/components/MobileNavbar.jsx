@@ -5,6 +5,7 @@ import Link from "next/link";
 import { docsConfig } from "@/config/docs";
 import { Sheet, SheetContent, SheetTrigger } from "@UI/sheet";
 
+import FormDialog from "@components/Form/FormDialog";
 import { Icons } from "@components/icons";
 import React, { useEffect, useState } from "react";
 import { Button, buttonVariants } from "@UI/button";
@@ -15,7 +16,6 @@ import { useRouter } from "next/navigation";
 import { cn } from "@lib/utils";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import SideNav from "./SideNav";
 
 export default function MobileNavbar() {
   const [open, setOpen] = useState(false);
@@ -68,10 +68,38 @@ export default function MobileNavbar() {
                     >
                       {item.title}
                     </MobileLink>
-                    <SideNav
-                      className="ml-4"
-                      items={docsConfig.sidebarNav[item.title]}
-                    />
+                    {docsConfig.sidebarNav[item.title]?.map((item, index) =>
+                      item.isForm ? (
+                        <FormDialog
+                          key={`${item.title}_formdialog_${index}`}
+                          triggerClass={"justify-start items-start"}
+                          title={item.title}
+                          triggerVariant={"ghost"}
+                          triggerTitle={
+                            <>
+                              {<item.icon className="mr-2 " />}
+                              {item.title}
+                            </>
+                          }
+                        >
+                          <item.Form />
+                        </FormDialog>
+                      ) : (
+                        <MobileLink
+                          key={item.href}
+                          href={item.href}
+                          onOpenChange={setOpen}
+                          className={cn(
+                            buttonVariants({ variant: "ghost" }),
+                            "hover:bg-transparent hover:underline",
+                            "justify-start flex flex-row gap-2"
+                          )}
+                        >
+                          {<item.icon />}
+                          <span className="flex">{item.title}</span>
+                        </MobileLink>
+                      )
+                    )}
                   </section>
                 )
             )}

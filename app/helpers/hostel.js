@@ -56,7 +56,7 @@ export function getHostelsFn(searchData) {
   if (searchData?.status) {
     filters += `&&status=${searchData?.status}`;
   }
-  console.log(filters);
+
   return useQuery({
     queryKey: [HOSTELS, filters],
     queryFn: () => getHostels(filters),
