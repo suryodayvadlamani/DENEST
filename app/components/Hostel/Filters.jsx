@@ -60,7 +60,7 @@ const Filters = ({ setSelectedFilters, hostelsData }) => {
   const form = useForm({
     defaultValues: {
       floorId: "",
-      hostelId: hostelsData.data[0].id,
+      hostelId: hostelsData?.data[0].id,
       roomType: "",
       sharing: "",
       status: "Vacant",
@@ -118,7 +118,7 @@ const Filters = ({ setSelectedFilters, hostelsData }) => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {hostelsData.data?.map((hostel) => {
+                        {hostelsData?.data?.map((hostel) => {
                           return (
                             <SelectItem key={hostel.id} value={`${hostel.id}`}>
                               {hostel.name}
@@ -154,7 +154,7 @@ const Filters = ({ setSelectedFilters, hostelsData }) => {
                       <SelectContent>
                         {Array.from(
                           {
-                            length: hostelsData.data.filter(
+                            length: hostelsData?.data.filter(
                               (x) => x.id == hostelsData.data[0].id
                             )[0]?.floors,
                           },

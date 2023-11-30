@@ -5,7 +5,6 @@ import { getHostelsFn } from "@/app/helpers/hostel";
 import Filters from "./Filters";
 import { addBedFn } from "@/app/helpers/bed";
 import { Button } from "@UI/button";
-import { Input } from "@UI/input";
 import { Label } from "@UI/label";
 import { BiSolidBed } from "react-icons/bi";
 import { BiBed } from "react-icons/bi";
@@ -19,59 +18,18 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@UI/popover";
 function Hostel() {
   const [bedOpen, setBedOpen] = useState(false);
-  const { data: hostelsData } = getHostelsFn();
+
   const [selectedRoom, setSelectedRoom] = useState("");
   const [filters, setSelectedFilters] = useState({
     floorId: "",
-    hostelId: hostelsData.data[0].id,
+    hostelId: "",
     roomType: "",
     sharing: "",
     status: "",
   });
-  const [selectedHostelRooms, setSelectedHostelRooms] = useState([]);
-
-  useEffect(() => {
-    setSelectedHostelRooms(() => {
-      let roomsData = hostelsData.data
-        .filter((x) => x.id == filters?.hostelId)[0]
-        .Rooms?.filter((room) => {
-          let returnData = true;
-          if (filters?.floorId) {
-            returnData = room.floorId == filters?.floorId;
-          }
-          if (filters?.sharing) {
-            returnData = returnData && room.capacity == filters?.sharing;
-          }
-          if (filters?.roomType) {
-            returnData = returnData && room.roomType == filters?.roomType;
-          }
-          return returnData;
-        });
-      if (filters?.status) {
-        roomsData = roomsData
-          .map((room) => {
-            return {
-              ...room,
-              Beds: room.Beds.filter(
-                (bed) => bed.occupied == (filters.status == "Occupied")
-              ),
-            };
-          })
-          .filter((x) => x.Beds.length > 0);
-      }
-
-      return roomsData;
-    });
-  }, [
-    filters.hostelId,
-    filters.floorId,
-    filters.sharing,
-    filters?.roomType,
-    filters?.status,
-  ]);
-
+  const { data: hostelsData } = getHostelsFn(filters);
   const { mutate: createBed, isLoading: mutationLoading } = addBedFn();
-
+  console.log(hostelsData?.data);
   const AddBed = () => {
     try {
       const roomData = hostelsData.data
@@ -122,9 +80,9 @@ function Hostel() {
               </SelectTrigger>
 
               <SelectContent>
-                {hostelsData.data
-                  .filter((x) => x.id == filters?.hostelId)[0]
-                  .Rooms?.map((room) => {
+                {hostelsData?.data
+                  ?.filter((x) => x.id == filters?.hostelId)[0]
+                  ?.Rooms?.map((room) => {
                     return (
                       <SelectItem
                         key={room.id}
@@ -144,10 +102,12 @@ function Hostel() {
         </Popover>
       </section>
       <div className="flex flex-row items-center justify-center gap-3 mt-3 w-full flex-wrap ">
-        {selectedHostelRooms &&
-          selectedHostelRooms.map((roomData) => (
-            <Room key={roomData.id} roomData={roomData} />
-          ))}
+        {hostelsData?.data &&
+          hostelsData?.data.map((hostel) =>
+            hostel.Rooms.map((roomData) => (
+              <Room key={roomData.id} roomData={roomData} />
+            ))
+          )}
       </div>
     </div>
   );

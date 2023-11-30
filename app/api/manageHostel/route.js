@@ -66,6 +66,50 @@ export async function GET(request) {
   const searchParams = request.nextUrl.searchParams;
   const startDate = searchParams.get("startDate");
   const endDate = searchParams.get("endDate");
+  const floorId = searchParams.get("floorId");
+  const hostelId = searchParams.get("hostelId");
+  const roomType = searchParams.get("roomType");
+  const sharing = searchParams.get("sharing");
+  const status = searchParams.get("status");
+
+  let bedSelection = {
+    select: {
+      id: true,
+      title: true,
+      occupied: true,
+    },
+  };
+  if (status) {
+    bedSelection = {
+      ...bedSelection,
+      where: { occupied: status == "Occupied" },
+    };
+  }
+  let roomSelection = {
+    select: {
+      title: true,
+      floorId: true,
+      id: true,
+      capacity: true,
+      roomType: true,
+      Beds: { ...bedSelection },
+    },
+  };
+  if (floorId) {
+    roomSelection = { ...roomSelection, where: { floorId: parseInt(floorId) } };
+  }
+  if (roomType) {
+    roomSelection = {
+      ...roomSelection,
+      where: { ...roomSelection.where, roomType },
+    };
+  }
+  if (sharing) {
+    roomSelection = {
+      ...roomSelection,
+      where: { ...roomSelection.where, capacity: sharing },
+    };
+  }
 
   try {
     let whereClause = {};
@@ -78,6 +122,9 @@ export async function GET(request) {
         break;
       default:
         break;
+    }
+    if (hostelId) {
+      whereClause = { ...whereClause, id: hostelId };
     }
 
     let hostelInfo = await prisma.hostel.findMany({
@@ -98,22 +145,7 @@ export async function GET(request) {
             userId: true,
           },
         },
-        Rooms: {
-          select: {
-            title: true,
-            floorId: true,
-            id: true,
-            capacity: true,
-            roomType: true,
-            Beds: {
-              select: {
-                id: true,
-                title: true,
-                occupied: true,
-              },
-            },
-          },
-        },
+        Rooms: { ...roomSelection },
       },
     });
 

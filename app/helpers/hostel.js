@@ -36,14 +36,29 @@ export function createHostelFn(cancelRef) {
     },
   });
 }
-export function getHostelsFn() {
+export function getHostelsFn(searchData) {
   const today = new Date();
   const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-
-  const filters = `startDate=${firstDay.toISOString()}`;
-
+  const dateFilters = `startDate=${firstDay.toISOString()}`;
+  let filters = `${dateFilters}`;
+  if (searchData?.floorId) {
+    filters += `&&floorId=${searchData?.floorId}`;
+  }
+  if (searchData?.hostelId) {
+    filters += `&&hostelId=${searchData?.hostelId}`;
+  }
+  if (searchData?.roomType) {
+    filters += `&&roomType=${searchData?.roomType}`;
+  }
+  if (searchData?.sharing) {
+    filters += `&&sharing=${searchData?.sharing}`;
+  }
+  if (searchData?.status) {
+    filters += `&&status=${searchData?.status}`;
+  }
+  console.log(filters);
   return useQuery({
-    queryKey: [HOSTELS],
+    queryKey: [HOSTELS, filters],
     queryFn: () => getHostels(filters),
   });
 }
