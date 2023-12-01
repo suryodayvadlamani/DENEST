@@ -66,7 +66,7 @@ const EditTenant = () => {
   const route = useRouter();
   const goBack = (e) => {
     e.preventDefault();
-    route.replace("/ment", { scroll: false });
+    route.replace("/userManagment", { scroll: false });
   };
 
   const onSubmit = async (formData) => {

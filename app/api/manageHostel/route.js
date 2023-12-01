@@ -123,6 +123,14 @@ export async function GET(request) {
       default:
         break;
     }
+    const filterData = await prisma.hostel.findMany({
+      where: { ...whereClause },
+      select: {
+        name: true,
+        id: true,
+        floors: true,
+      },
+    });
     if (hostelId) {
       whereClause = { ...whereClause, id: hostelId };
     }
@@ -199,7 +207,7 @@ export async function GET(request) {
       });
     }
 
-    return NextResponse.json(finalData, { status: 200 });
+    return NextResponse.json({ finalData, filterData }, { status: 200 });
   } catch (err) {
     console.log(err);
     return NextResponse.json(

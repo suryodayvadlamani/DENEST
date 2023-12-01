@@ -66,7 +66,7 @@ function Expense({ hostelsData }) {
         {mainFetch ? (
           <Skeleton className="w-1/3 h-70" />
         ) : (
-          data?.data.length > 0 && (
+          data?.data?.length > 0 && (
             <DataTable
               columns={columns}
               data={data.data}
