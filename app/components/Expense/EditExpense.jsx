@@ -21,7 +21,8 @@ const EditExpense = () => {
   const expenseId = searchParams.get("id");
 
   const { data: expenseData } = getExpenseByIdFn(expenseId);
-  const { data: hostelsData } = getHostelsFn();
+  const { data } = getHostelsFn();
+  const hostelsData = { data: data?.data.finalData };
 
   const { mutate: updateExpense, isLoading: mutationLoading } =
     updateExpenseIdFn();
@@ -93,7 +94,7 @@ const EditExpense = () => {
             form={form}
             id="hostelId"
             label="Hostel"
-            options={hostelsData?.data.map((hostel) => {
+            options={hostelsData?.data?.map((hostel) => {
               return { value: hostel.id, title: hostel.name };
             })}
           />

@@ -39,19 +39,20 @@ const Dashboard = () => {
     <div className="  flex justify-center items-center gap-3 h-full">
       <div className="flex flex-col gap-3 w-1/2  md:h-1/3">
         <DatePickerWithRange defaultDate={date} callBack={callBack} />
-        <Card className="flex flex-col gap-3 md:w-2/3 w-full">
-          <CardTitle className="p-6">
-            Expenses -{dashboardData?.data.totalExpense}
-          </CardTitle>
+        <Card className="flex flex-col md:w-2/3 w-full">
           <CardContent className="m-2">
             Total Expenses in given range
           </CardContent>
-        </Card>
-        <Card className="flex flex-col gap-3 md:w-2/3 w-full">
           <CardTitle className="p-6">
-            Income - {dashboardData?.data.totalRent}
+            Expenses : {dashboardData?.data.totalExpense}
           </CardTitle>
+        </Card>
+        <Card className="flex flex-col  md:w-2/3 w-full">
           <CardContent className="m-2">Total Income in given range</CardContent>
+
+          <CardTitle className="p-6">
+            Income : {dashboardData?.data.totalRent}
+          </CardTitle>
         </Card>
       </div>
     </div>

@@ -52,6 +52,7 @@ const AddTenantPay = () => {
               maxLength="10"
               minLength="10"
               label="Contact"
+              required
             />
             <FormInput
               className="mb-3"
@@ -60,6 +61,7 @@ const AddTenantPay = () => {
               id="expenseAmount"
               type="number"
               label="Amount"
+              required
             />
 
             <FormCalendar name="startDate" form={form} label="Start Date" />

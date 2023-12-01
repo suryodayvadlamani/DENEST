@@ -58,7 +58,8 @@ const AddTenant = () => {
     },
   });
 
-  const { data: hostelData } = getHostelsFn();
+  const { data } = getHostelsFn();
+  const hostelData = { data: data?.data.finalData };
 
   const { mutate: postUser, isLoading: mutationLoading } =
     createUserFn(cancelRef);
@@ -86,6 +87,7 @@ const AddTenant = () => {
             id="aadharText"
             type="tel"
             label="Aadhar Number"
+            required
           />
 
           <FormInput
@@ -113,7 +115,7 @@ const AddTenant = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {hostelData?.data.map((hostel) => {
+                      {hostelData?.data?.map((hostel) => {
                         return (
                           <SelectItem key={hostel.id} value={`${hostel.id}`}>
                             {hostel.name}

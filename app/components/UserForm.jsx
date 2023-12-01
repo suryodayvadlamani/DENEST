@@ -10,6 +10,7 @@ function UserForm({ form }) {
         id="manager"
         type="text"
         label="Name"
+        required
       />
       <FormInput
         className="mb-3"
@@ -19,6 +20,7 @@ function UserForm({ form }) {
         type="tel"
         label="Contact Number"
         maxLength="10"
+        required
       />
       <FormInput
         className="mb-3"
@@ -27,6 +29,7 @@ function UserForm({ form }) {
         id="email"
         type="email"
         label="Email Address"
+        required
       />
     </>
   );

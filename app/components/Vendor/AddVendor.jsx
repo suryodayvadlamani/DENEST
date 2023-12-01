@@ -57,6 +57,7 @@ const AddVendor = () => {
             type="tel"
             label={"GSTIN"}
             form={form}
+            required
           />
 
           <AddressForm form={form} />

@@ -29,7 +29,8 @@ import { createRoomFn } from "@/app/helpers/room";
 const AddRoom = ({ selectedHostel, selectedFloor }) => {
   const roomSchema = roomModel.omit({ id: true });
 
-  const { data: hostelsData } = getHostelsFn();
+  const { data } = getHostelsFn();
+  const hostelsData = { data: data?.data.finalData };
 
   const cancelRef = useRef(null);
 
@@ -123,7 +124,7 @@ const AddRoom = ({ selectedHostel, selectedFloor }) => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {hostelsData?.data.map((hostel) => {
+                    {hostelsData?.data?.map((hostel) => {
                       return (
                         <SelectItem key={hostel.id} value={`${hostel.id}`}>
                           {hostel.name}
