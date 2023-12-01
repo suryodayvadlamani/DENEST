@@ -58,7 +58,8 @@ const AddIncome = () => {
     },
   });
 
-  const { data: hostelData } = getHostelsFn();
+  const { data } = getHostelsFn();
+  const hostelData = { data: data?.data.finalData };
 
   const { mutate: postUser, isLoading: mutationLoading } =
     createUserForDayIncomeFn(cancelRef);
@@ -114,7 +115,7 @@ const AddIncome = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {hostelData?.data.map((hostel) => {
+                      {hostelData?.data?.map((hostel) => {
                         return (
                           <SelectItem key={hostel.id} value={`${hostel.id}`}>
                             {hostel.name}

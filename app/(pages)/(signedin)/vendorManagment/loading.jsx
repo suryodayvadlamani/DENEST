@@ -1,6 +1,6 @@
 import React from "react";
 import { Skeleton } from "@UI/skeleton";
-import { Card, CardContent, CardHeader } from "@UI/card";
+import { Card } from "@UI/card";
 const loading = () => {
   return (
     <>

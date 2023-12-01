@@ -34,8 +34,8 @@ const page = () => {
   const { status, data: session } = useSession({ required: true });
   const { isLoading, data, isError, error } = getRolesFn();
 
-  const { data: hostelData } = getHostelsFn();
-
+  const { data: data1 } = getHostelsFn();
+  const hostelData = data1?.data?.finalData;
   useEffect(() => {
     function select_role() {
       const userRoleId = session?.user.roleId;
@@ -150,7 +150,7 @@ const page = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {hostelData?.data.map((hostel) => {
+                          {hostelData?.map((hostel) => {
                             return (
                               <SelectItem
                                 key={hostel.id}

@@ -35,15 +35,7 @@ const page = () => {
   const [selectedRoles, setSelectedRoles] = useState([]);
   const { status, data: session } = useSession({ required: true });
   const { data } = getRolesFn();
-  const {
-    isFetchingNextPage,
-    isLoading,
-    isError,
-    data: vendorData,
-    error,
-    fetchNextPage,
-    hasNextPage,
-  } = getVendorsFn();
+  const { data: vendorData } = getVendorsFn();
 
   const flatData = useMemo(() => {
     if (!vendorData?.pages[0]) return [];
@@ -74,8 +66,6 @@ const page = () => {
     select_role();
   }, [data?.data]);
 
-  const { toast } = useToast();
-
   const userRolesSchema = z.object({
     email: z.string().min(1, { message: "Email is required" }).email({
       message: "Must be a valid email",
@@ -105,10 +95,6 @@ const page = () => {
     };
 
     try {
-      const res = await postCall("/api/manageUserRole", body_data, {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      });
       alert("Done");
     } catch (error) {
       console.log("Error during registration: ", error);
