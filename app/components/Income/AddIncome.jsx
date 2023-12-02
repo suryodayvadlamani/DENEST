@@ -88,6 +88,7 @@ const AddIncome = () => {
             id="aadharText"
             type="tel"
             label="Aadhar Number"
+            required
           />
 
           <FormInput
