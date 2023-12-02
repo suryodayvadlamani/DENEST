@@ -33,7 +33,8 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { LuFilter } from "react-icons/lu";
 
-const Filters = ({ setSelectedFilters, hostelsData }) => {
+const Filters = ({ setSelectedFilters, filterData }) => {
+  console.log(filterData);
   const numberToString = [
     "Ground",
     "First",
@@ -56,21 +57,23 @@ const Filters = ({ setSelectedFilters, hostelsData }) => {
     "Eighteenth",
     "Nineteenth",
   ];
-
+  if (!filterData || filterData?.length < 1) {
+    return <></>;
+  }
   const form = useForm({
     defaultValues: {
       floorId: "",
-      hostelId: hostelsData?.data[0].id,
+      hostelId: filterData[0].id,
       roomType: "",
       sharing: "",
       status: "Vacant",
     },
   });
-  const { reset } = form;
+  const { reset, getValues } = form;
   const formReset = () => {
     reset({
       floorId: "",
-
+      hostelId: "",
       roomType: "",
       sharing: "",
       status: "",
@@ -118,7 +121,7 @@ const Filters = ({ setSelectedFilters, hostelsData }) => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {hostelsData?.data?.map((hostel) => {
+                        {filterData?.map((hostel) => {
                           return (
                             <SelectItem key={hostel.id} value={`${hostel.id}`}>
                               {hostel.name}
@@ -154,9 +157,11 @@ const Filters = ({ setSelectedFilters, hostelsData }) => {
                       <SelectContent>
                         {Array.from(
                           {
-                            length: hostelsData?.data.filter(
-                              (x) => x.id == hostelsData.data[0].id
-                            )[0]?.floors,
+                            length:
+                              filterData.filter(
+                                (hostel) => hostel.id == getValues().hostelId
+                              )[0]?.floors ||
+                              Math.max(...filterData.map((o) => o.floors)),
                           },
                           () => 1
                         ).map((hostel, index) => {

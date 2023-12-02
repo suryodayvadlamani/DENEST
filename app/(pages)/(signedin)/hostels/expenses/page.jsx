@@ -12,8 +12,9 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 const Expenses = async () => {
   const queryClient = getQueryClient();
   const session = await getServerSession(authOptions);
-  const { data: hostelsData } = await getHostels();
+  const { data } = await getHostels();
 
+  const { finalData: hostelsData } = data;
   if (session) {
     await queryClient.prefetchQuery([EXPENSES], () => getExpense());
   }

@@ -17,6 +17,7 @@ function FormInput({
   isSearchable,
   searchCallback,
   label,
+  required = false,
   ...props
 }) {
   const [showPassword, showPasswordToggle] = useState(false);
@@ -80,6 +81,7 @@ function FormInput({
                     peer-placeholder-shown:top-2"
           >
             {label}
+            {required && <span className="text-red-600"> *</span>}
           </FormLabel>
           <FormMessage />
         </FormItem>

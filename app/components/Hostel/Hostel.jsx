@@ -27,12 +27,13 @@ function Hostel() {
     sharing: "",
     status: "",
   });
-  const { data: hostelsData } = getHostelsFn(filters);
+  const { data } = getHostelsFn(filters);
   const { mutate: createBed, isLoading: mutationLoading } = addBedFn();
-
+  const hostelsData = data?.data.finalData;
+  const filterData = data?.data.filterData;
   const AddBed = () => {
     try {
-      const roomData = hostelsData.data
+      const roomData = hostelsData
         .filter((x) => x.id == filters?.hostelId)[0]
         .Rooms?.filter((room) => room.id == selectedRoom)[0];
       const bedName =
@@ -66,7 +67,7 @@ function Hostel() {
         </Label>
 
         <Filters
-          hostelsData={hostelsData}
+          filterData={filterData}
           setSelectedFilters={setSelectedFilters}
         />
         <Popover open={bedOpen} onOpenChange={setBedOpen}>
@@ -80,19 +81,25 @@ function Hostel() {
               </SelectTrigger>
 
               <SelectContent>
-                {hostelsData?.data
-                  ?.filter((x) => x.id == filters?.hostelId)[0]
-                  ?.Rooms?.map((room) => {
-                    return (
-                      <SelectItem
-                        key={room.id}
-                        value={`${room.id}`}
-                        disabled={room.capacity <= room.Beds.length}
-                      >
-                        {room.title}
-                      </SelectItem>
-                    );
-                  })}
+                {hostelsData
+                  ?.filter((x) => {
+                    if (filters?.hostelId != "")
+                      return x.id == filters?.hostelId;
+                    else return true;
+                  })
+                  .map((hostel) =>
+                    hostel?.Rooms?.map((room) => {
+                      return (
+                        <SelectItem
+                          key={room.id}
+                          value={`${room.id}`}
+                          disabled={room.capacity <= room.Beds.length}
+                        >
+                          {room.title}
+                        </SelectItem>
+                      );
+                    })
+                  )}
               </SelectContent>
             </Select>
             <Button className="mt-3" onClick={() => AddBed()}>
@@ -102,8 +109,8 @@ function Hostel() {
         </Popover>
       </section>
       <div className="flex flex-row items-center justify-center gap-3 mt-3 w-full flex-wrap ">
-        {hostelsData?.data &&
-          hostelsData?.data.map((hostel) =>
+        {hostelsData &&
+          hostelsData.map((hostel) =>
             hostel.Rooms.map((roomData) => (
               <Room key={roomData.id} roomData={roomData} />
             ))

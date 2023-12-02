@@ -62,9 +62,13 @@ export default function DatePickerWithRange({
             onSelect={setDate}
             numberOfMonths={2}
           />
-          <section className="flex flex-row gap-4 items-center justify-around my-2">
-            <Button onClick={okClick}> OK</Button>
-            <Button onClick={() => setState(false)}> Cancel</Button>
+          <section className="flex gap-4 items-center justify-around ">
+            <Button className="mb-9" onClick={okClick}>
+              OK
+            </Button>
+            <Button className="mb-9" onClick={() => setState(false)}>
+              Cancel
+            </Button>
           </section>
         </PopoverContent>
       </Popover>

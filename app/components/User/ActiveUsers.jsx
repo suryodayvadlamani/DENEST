@@ -28,8 +28,8 @@ function ActiveUsers() {
           columns={tblColumns}
           data={flatData}
           title={"Users"}
-          filterColumn={"name"}
-          searchPlaceholder={"Search Name"}
+          filterColumn={"contact"}
+          searchPlaceholder={"Contact Number"}
           isFetchingNextPage={isFetchingNextPage}
           isLoading={isLoading}
           fetchNextPage={fetchNextPage}

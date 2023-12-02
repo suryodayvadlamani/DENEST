@@ -7,8 +7,8 @@ import { cn } from "@lib/utils";
 import { getHostelsFn } from "@/app/helpers/hostel";
 
 function Main() {
-  const { data: hostelsData } = getHostelsFn();
-
+  const { data } = getHostelsFn();
+  const hostelsData = { data: data?.data.finalData };
   return (
     <>
       <div className="flex flex-row gap-5 my-4">

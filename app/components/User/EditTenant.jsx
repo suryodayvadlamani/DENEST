@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { updateUser } from "@/app/server_functions/User";
 
-import { getUserByIdFn } from "@/app/helpers/user";
+import { getUserByIdFn, updateUserByIdFn } from "@/app/helpers/user";
 const EditTenant = () => {
   const userSchema = userModel.omit({ id: true });
   const searchParams = useSearchParams();
@@ -66,13 +66,15 @@ const EditTenant = () => {
   const route = useRouter();
   const goBack = (e) => {
     e.preventDefault();
-    route.replace("/ment", { scroll: false });
+    route.replace("/userManagment", { scroll: false });
   };
+  const { mutate: updateUser, isLoading: mutationLoading } = updateUserByIdFn();
+  const router = useRouter();
 
   const onSubmit = async (formData) => {
-    const { isError } = await updateUser(userId, formData);
+    await updateUser({ id: userId, data: { ...formData } });
 
-    if (!isError) route.replace("/userManagment");
+    route.replace("/userManagment");
   };
 
   return (
@@ -120,8 +122,8 @@ const EditTenant = () => {
             <div className="flex gap-3 justify-around">
               <Button
                 type="submit"
-                disabled={isSubmitting}
-                isLoading={isSubmitting}
+                disabled={mutationLoading}
+                isLoading={mutationLoading}
                 className="flex  justify-center gap-2"
               >
                 Submit
