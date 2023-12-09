@@ -44,11 +44,11 @@ function Expense({ hostelsData }) {
   const callBack = (date) => {
     setDate({ ...date });
   };
+
   const flatData = useMemo(() => {
     if (!expenseTypeData?.pages[0]) return [];
     return expenseTypeData?.pages?.flatMap((page) => page?.data) ?? [];
   }, [expenseTypeData?.pages]);
-
   return (
     <>
       <div className="flex flex-col md:flex-row gap-5 items-center w-full">

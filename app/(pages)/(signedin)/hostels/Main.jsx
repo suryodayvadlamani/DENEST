@@ -20,10 +20,10 @@ function Main() {
             "text-lg"
           )}
         >
-          Total Hostels {hostelsData?.data?.length}
+          Total Hostels : {hostelsData?.data?.length}
         </div>
 
-        <FormDialog title="Add Hostel" triggerTitle="+Add Hostel">
+        <FormDialog title="Add Hostel" triggerTitle="Add Hostel">
           <AddHostel />
         </FormDialog>
       </div>
