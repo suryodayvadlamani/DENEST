@@ -67,7 +67,11 @@ export const detailed_columns = [
   {
     accessorKey: "expenseDate",
     header: "ExpenseDate",
-    columns: (e) => <></>,
+    cell: ({ row }) => {
+      return row.getValue("expenseDate")
+        ? row.getValue("expenseDate").split("T")[0]
+        : row.getValue("expenseDate");
+    },
   },
   {
     accessorKey: "amount",
