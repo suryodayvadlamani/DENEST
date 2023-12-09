@@ -4,7 +4,7 @@ import { validateRole } from "app/helpers/validateRole";
 
 export async function GET(request, { params }) {
   const res = await validateRole();
-  console.log("Came");
+
   if (res?.error)
     return NextResponse.json(
       { message: res.error },

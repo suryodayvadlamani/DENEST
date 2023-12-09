@@ -66,7 +66,6 @@ const AddIncome = () => {
 
   const onSubmit = async (data) => {
     try {
-      console.log(data);
       postUser({
         ...data,
         hostelId: data.hostelId || session.user.hostelId,

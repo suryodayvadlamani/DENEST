@@ -17,7 +17,7 @@ export async function GET(request) {
   const searchParams = request.nextUrl.searchParams;
   const startDate = searchParams.get("startDate");
   const endDate = searchParams.get("endDate");
-  console.log({ startDate, endDate });
+
   try {
     let whereClause = {};
     switch (session.role) {

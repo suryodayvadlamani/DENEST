@@ -20,9 +20,19 @@ export default function DatePickerWithRange({
     to: new Date(defaultDate.endDate),
   });
   const okClick = () => {
+    let startDate = null;
+    if (date.from) {
+      startDate = new Date(date.from);
+      startDate.setHours(0, 0, 0, 0);
+    }
+    let endDate = null;
+    if (date.to) {
+      endDate = new Date(date.to);
+      endDate.setHours(23, 59, 59, 999);
+    }
     callBack({
-      startDate: date.from && new Date(date.from).toISOString(),
-      endDate: date.to && new Date(date.to).toISOString(),
+      startDate: startDate && startDate.toISOString(),
+      endDate: endDate && endDate.toISOString(),
     });
     setState(false);
   };
@@ -63,7 +73,7 @@ export default function DatePickerWithRange({
             numberOfMonths={2}
           />
           <section className="flex gap-4 items-center justify-around ">
-            <Button className="mb-9" onClick={okClick}>
+            <Button className="mb-9" onClick={() => okClick()}>
               OK
             </Button>
             <Button className="mb-9" onClick={() => setState(false)}>

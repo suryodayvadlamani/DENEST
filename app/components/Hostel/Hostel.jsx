@@ -33,19 +33,17 @@ function Hostel() {
   const filterData = data?.data.filterData;
   const AddBed = () => {
     try {
-      const roomData = hostelsData
-        .filter((x) => x.id == filters?.hostelId)[0]
-        .Rooms?.filter((room) => room.id == selectedRoom)[0];
       const bedName =
-        roomData?.Beds.length > 0
-          ? parseInt(roomData?.Beds.slice(-1)[0]?.title.replace("B", "")) + 1
+        selectedRoom?.Beds.length > 0
+          ? parseInt(selectedRoom?.Beds.slice(-1)[0]?.title.replace("B", "")) +
+            1
           : 1;
 
       createBed({
         title: `B${bedName}`,
         isActive: true,
         occupied: false,
-        roomId: selectedRoom,
+        roomId: selectedRoom.id,
       });
       setBedOpen(false);
     } catch (error) {
@@ -72,7 +70,9 @@ function Hostel() {
         />
         <Popover open={bedOpen} onOpenChange={setBedOpen}>
           <PopoverTrigger asChild>
-            <Button>+Add Bed</Button>
+            <Button disabled={mutationLoading} isLoading={mutationLoading}>
+              +Add Bed
+            </Button>
           </PopoverTrigger>
           <PopoverContent className="w-60">
             <Select onValueChange={setSelectedRoom}>
@@ -92,7 +92,7 @@ function Hostel() {
                       return (
                         <SelectItem
                           key={room.id}
-                          value={`${room.id}`}
+                          value={room}
                           disabled={room.capacity <= room.Beds.length}
                         >
                           {room.title}

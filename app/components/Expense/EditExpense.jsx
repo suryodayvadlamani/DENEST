@@ -60,7 +60,6 @@ const EditExpense = () => {
   };
 
   const onSubmit = async (formData) => {
-    console.log(formData);
     await updateExpense({ id: expenseId, data: { ...formData } });
     router.replace("/hostels/expenses");
   };

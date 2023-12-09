@@ -147,7 +147,7 @@ model Income {
   name          String?
   password      String?
   /// @zod.min(1, { message: "Email is must." }).email("This is not a valid email.")
-  email         String?   @unique
+  email         String?
   emailVerified DateTime?
   image         String?
   /// @zod.min(1, { message: "Aadhar is must." })

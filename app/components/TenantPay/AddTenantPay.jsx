@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { createTenantPayFn } from "@/app/helpers/tenantpay";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -9,12 +9,20 @@ import FormInput from "@components/Form/FormInput";
 import FormCalendar from "@components/Form/FormCalendar";
 import FormSelect from "@components/Form/FormSelect";
 import { Form } from "@UI/form";
-
+import { Separator } from "@UI/separator";
 import { tenantPayModel } from "@/prisma/zod";
 import { DialogClose } from "@radix-ui/react-dialog";
+import { getUserById } from "@/app/helpers/user";
+import { Label } from "@UI/label";
+import { z } from "zod";
 const AddTenantPay = () => {
+  const [userName, setUserName] = useState("");
   const cancelRef = useRef(null);
-  const tenantPaySchema = tenantPayModel.omit({ id: true });
+  const tenantPaySchema = tenantPayModel.omit({ id: true }).extend({
+    tenantContact: z
+      .string({ message: "Must be 10 digit number" })
+      .min(10, { message: "Must be 10 digit number" }),
+  });
   const form = useForm({
     resolver: zodResolver(tenantPaySchema),
     defaultValues: {
@@ -26,16 +34,38 @@ const AddTenantPay = () => {
       paidDate: "",
     },
   });
-
+  const { getFieldState, trigger, formState, setError, clearErrors } = form;
+  const { errors } = formState;
   const { mutate: postTenantPay, isLoading: mutationLoading } =
     createTenantPayFn(cancelRef);
 
   const onSubmit = async (data) => {
     try {
-      console.log(data);
       postTenantPay(data);
     } catch (error) {
       console.log("Error during registration: ", error);
+    }
+  };
+  const searchCallback = async (value) => {
+    try {
+      await trigger("tenantContact");
+      const { error } = getFieldState("tenantContact");
+      if (!error?.message) {
+        const data = await getUserById(value);
+        if (data.status == 200) {
+          clearErrors("tenantContact");
+
+          setUserName(data?.data.name);
+        } else {
+          setError("tenantContact", {
+            type: "manual",
+            message:
+              "Please check your contact number otherwise create a new tenant",
+          });
+        }
+      }
+    } catch (e) {
+      console.log("inside this", e);
     }
   };
   return (
@@ -45,15 +75,23 @@ const AddTenantPay = () => {
           <form onSubmit={form.handleSubmit(onSubmit)} className=" space-y-6">
             <FormInput
               className="mb-3"
-              name="userId"
+              name="tenantContact"
               form={form}
-              id="userId"
+              id="tenantContact"
               type="tel"
               maxLength="10"
               minLength="10"
               label="Contact"
               required
+              isSearchable={true}
+              searchCallback={searchCallback}
             />
+            {userName && (
+              <>
+                <Label className="ml-4 text-primary">{userName}</Label>
+                <Separator className="my-2" />
+              </>
+            )}
             <FormInput
               className="mb-3"
               name="amount"

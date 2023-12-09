@@ -72,7 +72,7 @@ export const authOptions = {
               role: true,
             },
           });
-          console.log(userRole?.roleId);
+
           return {
             ...token,
             roleId: userRole?.roleId,

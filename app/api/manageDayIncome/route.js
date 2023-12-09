@@ -53,17 +53,7 @@ export async function POST(request) {
         days,
       },
     });
-    console.log(hostelId);
-    const urData = {
-      userId: data.id,
-      roleId: TENANT,
-      isActive: true,
-      vendorId: session.user.vendorId,
-      hostelId: hostelId,
-      created: new Date(),
-    };
 
-    const res = await createRole(urData);
     return NextResponse.json({ message: "Tenant Registered" }, { status: 201 });
   } catch (err) {
     console.log(err);
@@ -93,9 +83,11 @@ export async function GET(request) {
 
     const isActive = paramData.get("isActive") == "true";
     const isTenant = paramData.get("isTenant");
+    const startDate = paramData.get("startDate");
+    const endDate = paramData.get("endDate");
     const take = parseInt(paramData.get("take")) || 10;
     const lastCursor = paramData.get("lastCursor") || undefined;
-
+    console.log(startDate, endDate, "Inside Incomr");
     let options = {};
 
     switch (session.role) {
@@ -178,6 +170,42 @@ export async function GET(request) {
         id: "asc",
       },
     };
+    if (startDate && endDate && startDate != "false" && endDate != "false") {
+      options = {
+        ...options,
+        where: {
+          ...options.where,
+          createdDate: {
+            gte: startDate,
+          },
+          createdDate: {
+            lte: endDate,
+          },
+        },
+      };
+    }
+    if (startDate && startDate != "false") {
+      options = {
+        ...options,
+        where: {
+          ...options.where,
+          createdDate: {
+            gte: startDate,
+          },
+        },
+      };
+    }
+    if (endDate && endDate != "false") {
+      options = {
+        ...options,
+        where: {
+          ...options.where,
+          createdDate: {
+            lte: endDate,
+          },
+        },
+      };
+    }
 
     const resp = await prisma.income.findMany(options);
 

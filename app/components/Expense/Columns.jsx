@@ -67,6 +67,7 @@ export const detailed_columns = [
   {
     accessorKey: "expenseDate",
     header: "ExpenseDate",
+    columns: (e) => <></>,
   },
   {
     accessorKey: "amount",

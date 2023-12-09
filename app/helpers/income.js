@@ -36,7 +36,11 @@ export function createUserForDayIncomeFn(cancelRef) {
       toast({
         title: "User Added Successfully",
       });
-      queryClient.invalidateQueries([INCOME]);
+
+      queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey[0] === INCOME,
+      });
+
       cancelRef.current.click();
     },
     onError: () => {
@@ -52,46 +56,23 @@ export const getUsersDayWise = ({
   take = 10,
   pageParam,
   isActive,
+  date,
 }) => {
-  const url = `/api/manageDayIncome?isActive=${isActive}&&isTenant=${!!isTenant}&&take=${take}${
+  let url = `/api/manageDayIncome?isActive=${isActive}&&isTenant=${!!isTenant}&&take=${take}${
     pageParam ? `&&lastCursor=${pageParam}` : ""
   }`;
+  if (date.startDate) url = url + `&&startDate=${date.startDate}`;
+  if (date.endDate) url = url + `&&endDate=${date.endDate}`;
   return request({
     url: url,
   });
 };
 
-export function getUsersFnDayWise(isActive) {
+export function getUsersFnDayWise(isActive, date) {
   return useInfiniteQuery({
-    queryKey: [INCOME, isActive],
+    queryKey: [INCOME, { ...date }],
     queryFn: ({ pageParam }) => {
-      return getUsersDayWise({ pageParam, isActive: isActive });
-    },
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      return lastPage?.data?.meta?.nextId ?? false;
-    },
-  });
-}
-
-export const getUsersMonthWise = ({
-  isTenant,
-
-  pageParam,
-  isActive,
-}) => {
-  const url = `/api/manageDayIncome?isActive=${isActive}&&isTenant=${!!isTenant}${
-    pageParam ? `&&lastCursor=${pageParam}` : ""
-  }`;
-  return request({
-    url: url,
-  });
-};
-export function getUsersFnMonthWise(isActive) {
-  return useInfiniteQuery({
-    queryKey: [INCOME, isActive],
-    queryFn: ({ pageParam }) => {
-      return getUsersMonthWise({ pageParam, isActive: isActive });
+      return getUsersDayWise({ pageParam, isActive: isActive, date });
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {

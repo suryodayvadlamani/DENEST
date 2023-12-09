@@ -7,8 +7,16 @@ import { getDayIncome } from "@/app/server_functions/Income";
 
 export default async function DayIncome() {
   const queryClient = getQueryClient();
-  await queryClient.prefetchInfiniteQuery([INCOME, "false"], () =>
-    getDayIncome()
+  const today = new Date();
+  let startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  startDate.setHours(0, 0, 0, 0);
+  today.setHours(23, 59, 59, 999);
+  const date = {
+    startDate: startDate.toISOString(),
+    endDate: today.toISOString(),
+  };
+  await queryClient.prefetchInfiniteQuery([INCOME, { ...date }], () =>
+    getDayIncome(date)
   );
   const dehydratedState = dehydrate(queryClient);
 
