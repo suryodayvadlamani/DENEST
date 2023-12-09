@@ -9,7 +9,7 @@ const loading = () => {
           <div className="text-sm ">Occupied</div>
         </div>
       </div>
-      <div className="flex items-center justify-center gap-2 mt-2">
+      <div className="flex flex-col md:flex-row items-center justify-center gap-2 mt-2">
         <Card className="items-center justify-center flex cursor-pointer ">
           <Skeleton className="w-72 h-28" />
         </Card>
@@ -20,7 +20,7 @@ const loading = () => {
           <Skeleton className="w-72 h-28" />
         </Card>
       </div>
-      <div className="flex items-center justify-center gap-2 mt-2">
+      <div className="flex flex-col md:flex-row items-center justify-center gap-2 mt-2">
         <Card className="items-center justify-center flex cursor-pointer ">
           <Skeleton className="w-72 h-28" />
         </Card>

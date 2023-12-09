@@ -9,7 +9,7 @@ import { Button } from "@UI/button";
 import { useSearchParams } from "next/navigation";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@UI/tabs";
-import MonthlyIncome from "@components/Income/MonthlyIncome";
+
 import DayWiseIncome from "@components/Income/DayWiseIncome";
 
 const Income = () => {
@@ -17,12 +17,17 @@ const Income = () => {
 
   const activeTab = searchParams.get("activeTab") || "daywise";
   const today = new Date();
+  const starDate = new Date(today.getFullYear(), today.getMonth(), 1);
+
+  today.setHours(23, 59, 59, 999);
+  starDate.setHours(0, 0, 0, 0);
   const [date, setDate] = useState({
-    startDate: new Date(today.getFullYear(), today.getMonth(), 1).toISOString(),
+    startDate: starDate.toISOString(),
     endDate: today.toISOString(),
   });
-  const callBack = (date) => {
-    setDate({ ...date });
+
+  const callBack = (selectedDate) => {
+    setDate({ ...selectedDate });
   };
   return (
     <>
@@ -35,7 +40,7 @@ const Income = () => {
         </div>
       </div>
       <div className="my-2">
-        <DayWiseIncome />
+        <DayWiseIncome date={date} />
       </div>
     </>
   );

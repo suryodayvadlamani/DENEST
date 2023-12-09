@@ -6,7 +6,7 @@ import { limiter } from "../config/limiter";
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
-  console.log(session);
+
   if (!session)
     return NextResponse.json(
       { message: "You don't have permission!" },
@@ -31,7 +31,6 @@ export async function POST(request) {
 
     return NextResponse.json({ message: "Bed Registered" }, { status: 201 });
   } catch (err) {
-    console.log("Created by me");
     console.log(err);
     return NextResponse.json(
       { message: "Sorry not a lucky day try again" },

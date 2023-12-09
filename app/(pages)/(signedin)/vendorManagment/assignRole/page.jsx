@@ -95,7 +95,6 @@ const page = () => {
     };
 
     try {
-      alert("Done");
     } catch (error) {
       console.log("Error during registration: ", error);
     }

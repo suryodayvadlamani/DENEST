@@ -43,7 +43,6 @@ const LoginForm = () => {
         redirect: false,
       });
 
-      console.log({ callbackUrl, res });
       if (res?.status != 200) {
         setError("Invalid Credentials");
         return;

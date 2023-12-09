@@ -34,7 +34,6 @@ import { useEffect } from "react";
 import { LuFilter } from "react-icons/lu";
 
 const Filters = ({ setSelectedFilters, filterData }) => {
-  console.log(filterData);
   const numberToString = [
     "Ground",
     "First",

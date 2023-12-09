@@ -1,6 +1,7 @@
 import { request } from "@lib/axios_util";
 import { useToast } from "@UI/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { HOSTELS } from "@lib/Query_Keys";
 
 export const addBed = (data) => {
   return request({
@@ -24,7 +25,10 @@ export function updateBedFn() {
       toast({
         title: "Bed Removed Successfully",
       });
-      queryClient.invalidateQueries(["hostels"]);
+
+      queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey[0] === HOSTELS,
+      });
     },
     onError: () => {
       toast({
@@ -38,10 +42,13 @@ export function addBedFn() {
   const queryClient = useQueryClient();
   return useMutation(addBed, {
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey[0] === HOSTELS,
+      });
+
       toast({
         title: "Bed added Successfully",
       });
-      queryClient.invalidateQueries(["hostels"]);
     },
     onError: () => {
       toast({

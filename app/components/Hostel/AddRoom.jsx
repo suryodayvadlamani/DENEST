@@ -49,7 +49,6 @@ const AddRoom = ({ selectedHostel, selectedFloor }) => {
   const { mutate: createRoom, isLoading: mutationLoading } =
     createRoomFn(cancelRef);
   const onSubmit = async (data) => {
-    console.log({ data });
     try {
       createRoom(data);
     } catch (error) {
